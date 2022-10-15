@@ -1,28 +1,82 @@
 defmodule SecretVault.MixProject do
   use Mix.Project
 
+  # Change the version later
+  @version "1.0.0"
+  @source "https://github.com/spawnfest/secret_vault"
+
   def project do
     [
       app: :secret_vault,
-      version: "0.1.0",
-      elixir: "~> 1.13",
+      version: @version,
+      elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      description: description(),
+      package: package(),
+      name: "Pathex",
+      source_url: @source,
+      docs: docs()
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
+  defp description do
+    "Secret management inside your repository"
+  end
+
+  defp package do
+    [
+      description: description(),
+      licenses: ["BSD 2-Clause"],
+      files: [
+        "lib",
+        "mix.exs",
+        "README.md",
+        ".formatter.exs"
+      ],
+      maintainers: [
+        "hissssst",
+        "yunmikun2"
+      ],
+      links: %{
+        GitHub: @source,
+        Changelog: "#{@source}/blob/main/CHANGELOG.md"
+      }
+    ]
+  end
+
+  defp docs do
+    [
+      source_ref: "v#{@version}",
+      main: "readme"
+
+      # TODO
+      # extra_section: "GUIDES",
+      # extras: ["README.md" | Path.wildcard("guides/*/*")] ++ ["CHANGELOG.md"],
+
+      # groups_for_modules: groups_for_modules(),
+      # groups_for_extras: groups_for_extras()
+    ]
+  end
+
   def application do
     [
       extra_applications: [:logger]
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      # Type checking
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
+      {:gradient, github: "esl/gradient", only: :dev, runtime: false},
+
+      # Linting
+      {:mix_unused, "~> 0.4", only: :dev, runtime: false},
+      {:credo, "~> 1.6", only: :dev, runtime: false},
+
+      # Documentation
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false}
     ]
   end
 end

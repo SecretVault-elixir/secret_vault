@@ -1,0 +1,23 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Elixir ${{matrix.elixir}} (Erlang/OTP ${{matrix.otp}})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        otp: ['25.0', '24.2', '23.3']
+        elixir: ['1.14.1', '1.13.4']
+    steps:
+      - uses: actions/checkout@v2
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      - run: mix deps.get
+      - run: mix compile --warnings-as-errors
+      - run: mix credo --strict
+      - run: mix format --check-formatted
+      - run: mix test
