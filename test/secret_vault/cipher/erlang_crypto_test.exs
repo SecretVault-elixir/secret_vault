@@ -1,5 +1,5 @@
 defmodule SecretVault.Cipher.ErlangCryptoTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias SecretVault.Cipher.ErlangCrypto
 

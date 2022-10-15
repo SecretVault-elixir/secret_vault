@@ -1,5 +1,5 @@
 defmodule SecretVault.KDFs.PBKDF2Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias SecretVault.KDFs.PBKDF2
 
