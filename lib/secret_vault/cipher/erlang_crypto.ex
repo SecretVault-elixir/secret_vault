@@ -51,7 +51,7 @@ defmodule SecretVault.Cipher.ErlangCrypto do
         )
 
       _ ->
-        #TODO
+        # TODO
         raise "Bad base16"
     end
   end

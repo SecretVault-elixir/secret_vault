@@ -38,7 +38,9 @@ defmodule SecretVault.Cipher do
     |> Enum.join(";")
   end
 
-  @spec unpack(binary()) :: {:ok, cipher :: String.t(), [property :: String.t()]} | {:error, reason :: atom()}
+  @spec unpack(binary()) ::
+          {:ok, cipher :: String.t(), [property :: String.t()]}
+          | {:error, reason :: atom()}
   def unpack(binary) do
     case String.split(binary, ";") do
       [cipher | properties] ->
@@ -46,7 +48,7 @@ defmodule SecretVault.Cipher do
           Enum.map(properties, fn property_base16 ->
             case Base.decode16(property_base16) do
               {:ok, decoded} -> decoded
-              :error -> throw :bad_base16
+              :error -> throw(:bad_base16)
             end
           end)
 
@@ -58,5 +60,4 @@ defmodule SecretVault.Cipher do
   catch
     :bad_base16 -> {:error, :bad_base16}
   end
-
 end
