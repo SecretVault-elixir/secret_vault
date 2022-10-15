@@ -41,23 +41,16 @@ defmodule SecretVault.Cipher do
   @spec unpack(binary()) ::
           {:ok, cipher :: String.t(), [property :: String.t()]}
           | {:error, reason :: atom()}
-  def unpack(binary) do
+  def unpack(binary) when is_binary(binary) do
     case String.split(binary, ";") do
       [cipher | properties] ->
-        properties =
-          Enum.map(properties, fn property_base16 ->
-            case Base.decode16(property_base16) do
-              {:ok, decoded} -> decoded
-              :error -> throw(:bad_base16)
-            end
-          end)
-
+        properties = Enum.map(properties, &Base.decode16!/1)
         {:ok, cipher, properties}
 
       _ ->
         {:error, :no_codec}
     end
-  catch
-    :bad_base16 -> {:error, :bad_base16}
+  rescue
+    ArgumentError -> {:error, :bad_base16}
   end
 end
