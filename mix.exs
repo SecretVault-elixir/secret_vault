@@ -76,7 +76,10 @@ defmodule SecretVault.MixProject do
       {:credo, "~> 1.6", only: :dev, runtime: false},
 
       # Documentation
-      {:ex_doc, "~> 0.28", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
+
+      # PBKDF
+      {:pbkdf2_key_derivation, "~> 2.0", optional: true}
     ]
   end
 end

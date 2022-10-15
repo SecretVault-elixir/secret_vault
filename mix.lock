@@ -15,4 +15,5 @@
   "makeup_erlang": {:hex, :makeup_erlang, "0.1.1", "3fcb7f09eb9d98dc4d208f49cc955a34218fc41ff6b84df7c75b3e6e533cc65f", [:mix], [{:makeup, "~> 1.0", [hex: :makeup, repo: "hexpm", optional: false]}], "hexpm", "174d0809e98a4ef0b3309256cbf97101c6ec01c4ab0b23e926a9e17df2077cbb"},
   "mix_unused": {:hex, :mix_unused, "0.4.0", "f409e1261fa70927b3155b91fd3ed958f0fb1278560bf98ec186bd6d474aa2e5", [:mix], [{:libgraph, ">= 0.0.0", [hex: :libgraph, repo: "hexpm", optional: false]}], "hexpm", "082f6b342d28a1760ad309c7c0483f747d1576a82a4b7d8205d07196ff533b30"},
   "nimble_parsec": {:hex, :nimble_parsec, "1.2.3", "244836e6e3f1200c7f30cb56733fd808744eca61fd182f731eac4af635cc6d0b", [:mix], [], "hexpm", "c8d789e39b9131acf7b99291e93dae60ab48ef14a7ee9d58c6964f59efb570b0"},
+  "pbkdf2_key_derivation": {:hex, :pbkdf2_key_derivation, "2.0.0", "23e47e8f30ac37176b2f3ac8224032ab36c7e5124fe9d2d0417690df1154c77a", [:mix], [], "hexpm", "8b2597ec9c0e2d537f0e02237641b441aa95b3bca74097d59fe0de7c1c823925"},
 }
