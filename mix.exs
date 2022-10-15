@@ -16,7 +16,8 @@ defmodule SecretVault.MixProject do
       package: package(),
       name: "Pathex",
       source_url: @source,
-      docs: docs()
+      docs: docs(),
+      dialyzer: dialyzer()
     ]
   end
 
@@ -81,5 +82,9 @@ defmodule SecretVault.MixProject do
       # PBKDF
       {:pbkdf2_key_derivation, "~> 2.0", optional: true}
     ]
+  end
+
+  defp dialyzer do
+    [plt_add_apps: [:mix]]
   end
 end
