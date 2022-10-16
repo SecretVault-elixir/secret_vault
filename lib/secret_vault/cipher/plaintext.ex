@@ -12,12 +12,12 @@ defmodule SecretVault.Cipher.Plaintext do
 
   @impl true
   def encrypt(_key, plain_text, _opts) do
-    Cipher.pack("PLAIN", [plain_text])
+    Cipher.pack("PLAIN", "PLAIN", [plain_text])
   end
 
   @impl true
   def decrypt(_key, cipher_text, _opts) do
-    splitted_plaintext = Cipher.unpack!("PLAIN", cipher_text)
+    ["PLAIN", splitted_plaintext] = Cipher.unpack!("PLAIN", cipher_text)
     {:ok, Enum.join(splitted_plaintext, ";")}
   end
 end
