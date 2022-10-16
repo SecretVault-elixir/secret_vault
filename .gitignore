@@ -24,3 +24,6 @@ secret_vault-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# We don't need any persistant configuration here.
+/config/
