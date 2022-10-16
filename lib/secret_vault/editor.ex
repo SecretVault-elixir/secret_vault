@@ -1,4 +1,4 @@
-defmodule SecretVault.EditorHelper do
+defmodule SecretVault.Editor do
   @moduledoc false
   # This module incapsulates working with starting a text editor.
 

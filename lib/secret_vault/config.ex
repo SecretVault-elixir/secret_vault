@@ -119,14 +119,61 @@ defmodule SecretVault.Config do
     struct(__MODULE__, [{:key, key} | opts])
   end
 
-  # TODO
-  # def from_env(app_name, opts \\ []) do
-  #   key = Keyword.get(opts, :key, :secret_vault)
-  #   env = Application.fetch_env!(app_name,
-  # end
+  current_environment = "#{Mix.env()}"
+
+  @doc """
+  Same as `fetch_from_env/3`, but passes `env` authomatically.
+  """
+  @spec fetch_from_env(atom(), prefix()) ::
+          {:ok, t()}
+          | :error
+          | {:error, {:no_configuration_for_prefix, prefix()}}
+  def fetch_from_env(otp_app, prefix)
+      when is_atom(otp_app) and is_binary(prefix) do
+    fetch_from_env(otp_app, unquote(current_environment), prefix)
+  end
+
+  @doc """
+  Fetch config from the application configuration (e.g. in
+  `confix.exs`).
+
+  `otp_app` is the current OTP application name. `env` is `Mix.env()`
+  value as a binary (string). `prefix` must be one of the configured
+  prefixes.
+  """
+  @spec fetch_from_env(atom(), String.t(), prefix()) ::
+          {:ok, t()}
+          | :error
+          | {:error, {:no_configuration_for_prefix, prefix()}}
+  def fetch_from_env(otp_app, env, prefix)
+      when is_atom(otp_app) and is_binary(env) and is_binary(prefix) do
+    with {:ok, prefixes} <- Application.fetch_env(otp_app, :secret_vault),
+         {:ok, opts} <- find_prefix(prefixes, prefix) do
+      priv_dir = File.cwd!()
+
+      opts =
+        opts
+        |> Keyword.put(:prefix, prefix)
+        |> Keyword.put(:priv_dir, priv_dir)
+
+      config = new(otp_app, opts)
+      {:ok, %__MODULE__{config | env: env}}
+    end
+  end
+
+  defp find_prefix([], prefix) do
+    {:error, {:no_configuration_for_prefix, prefix}}
+  end
+
+  defp find_prefix([{atom_prefix, opts} | rest], prefix) do
+    case to_string(atom_prefix) do
+      ^prefix -> {:ok, opts}
+      _ -> find_prefix(rest, prefix)
+    end
+  end
 
   # This function is required primarily for doctests
-  if Code.ensure_loaded?(Mix) && function_exported?(Mix, :env, 0) &&
+  if Code.ensure_loaded?(Mix) and function_exported?(Mix, :env, 0) and
        Mix.env() == :test do
     def test_config do
       new(:secret_vault,

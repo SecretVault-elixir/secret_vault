@@ -14,18 +14,18 @@ defmodule Mix.Tasks.Scr.Create do
 
   use Mix.Task
 
-  alias SecretVault.{EditorHelper, TaskHelper}
+  alias SecretVault.{CLI, Config, Editor}
 
   @impl true
   def run(args)
 
   def run([environment, name | rest]) do
     otp_app = Mix.Project.config()[:app]
-    prefix = TaskHelper.find_option(rest, "p", "prefix") || "default"
+    prefix = CLI.find_option(rest, "p", "prefix") || "default"
 
-    with {:ok, config} <- TaskHelper.fetch_config(otp_app, environment, prefix),
+    with {:ok, config} <- Config.fetch_from_env(otp_app, environment, prefix),
          :ok <- ensure_secret_doesn_not_exist(config, name),
-         {:ok, data} <- EditorHelper.open_new_file() do
+         {:ok, data} <- Editor.open_new_file() do
       SecretVault.put(config, name, data)
     else
       {:error, :secret_already_exists} ->
