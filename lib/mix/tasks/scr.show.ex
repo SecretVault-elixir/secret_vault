@@ -26,19 +26,17 @@ defmodule Mix.Tasks.Scr.Show do
 
   use Mix.Task
 
-  alias SecretVault.ConfigHelper
+  import SecretVault.TaskHelper
 
   @impl true
   def run(args)
 
-  def run([environment, name | rest]) do
-    key = ""
-
+  def run([env, name | rest]) do
     otp_app = Mix.Project.config()[:app]
-    prefix = find_prefix(rest)
+    prefix = find_option(rest, "p", "prefix") || "default"
 
-    with {:ok, config} <- ConfigHelper.fetch_config(otp_app, prefix),
-         {:ok, data} <- SecretVault.fetch_secret(config, key, environment, name) do
+    with {:ok, config} <- fetch_config(otp_app, env, prefix),
+         {:ok, data} <- SecretVault.fetch(config, name) do
       Mix.shell().info(data)
     else
       {:error, {:no_configuration_for_prefix, prefix}} ->
@@ -55,20 +53,20 @@ defmodule Mix.Tasks.Scr.Show do
         Mix.shell().error(message)
 
       {:error, :secret_not_found} ->
-        message = "Secret #{name} not found in environment #{environment}"
+        message = "Secret #{name} not found in environment #{env}"
         Mix.shell().error(message)
 
       {:error, :unknown_environment} ->
-        Mix.shell().error("Environment #{environment} does not exist")
+        Mix.shell().error("Environment #{env} does not exist")
     end
   end
 
-  def run([environment | rest]) do
+  def run([env | rest]) do
     otp_app = Mix.Project.config()[:app]
-    prefix = find_prefix(rest)
+    prefix = find_option(rest, "p", "prefix") || "default"
 
-    with {:ok, config} <- ConfigHelper.fetch_config(otp_app, prefix),
-         {:ok, secrets} <- SecretVault.list_secrets(config, environment) do
+    with {:ok, config} <- fetch_config(otp_app, env, prefix),
+         {:ok, secrets} <- SecretVault.list(config) do
       message = Enum.join(secrets, "\n")
       Mix.shell().info(message)
     else
@@ -86,24 +84,12 @@ defmodule Mix.Tasks.Scr.Show do
         Mix.shell().error(message)
 
       {:error, :unknown_environment} ->
-        Mix.shell().error("Environment #{environment} does not exist")
+        Mix.shell().error("Environment #{env} does not exist")
     end
   end
 
   def run(_args) do
     msg = "Invalid number of arguments. Use `mix help scr.show`."
     Mix.shell().error(msg)
-  end
-
-  defp find_prefix(["--prefix", prefix | _rest]) do
-    prefix
-  end
-
-  defp find_prefix([_ | rest]) do
-    find_prefix(rest)
-  end
-
-  defp find_prefix([]) do
-    nil
   end
 end

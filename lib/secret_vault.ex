@@ -1,20 +1,46 @@
 defmodule SecretVault do
+
   @moduledoc """
   Provides a way to access existing stored secrets.
   """
 
-  alias SecretVault.{Config, FSResolver}
+  alias SecretVault.Config
+
+  @typedoc """
+  - `:unknown_prefix` means that directory with secrets is not present on disk
+  - `:secret_not_found` means that secret file itself is not present
+  """
+  @type reason :: :unknown_prefix | :secret_not_found
+
+  @typedoc """
+  Name of a secret
+  """
+  @type name :: String.t()
+
+  @typedoc """
+  Binary value you want to store in secret.
+  To store arbitary structures, try usings `:erlang.term_to_binary/2`
+  """
+  @type value :: binary()
+
+  extension = ".vault_secret"
 
   @doc """
   Show secrets available in the `environment`.
   """
-  @spec list_secrets(Config.t(), String.t()) ::
-          {:ok, [String.t()]} | {:error, :unknown_environment}
-  def list_secrets(config, environment) when is_binary(environment) do
-    environment_path = FSResolver.resolve_environment_path(config, environment)
+  @spec list(Config.t()) :: {:ok, [String.t()]} | {:error, :unknown_prefix}
+  def list(%Config{} = config) do
+    case File.ls resolve_path config do
+      {:ok, files} ->
+        files =
+          Enum.map(files, fn filename ->
+            {name, unquote extension} = String.split_at(filename, - unquote byte_size extension)
+            name
+          end)
+        {:ok, files}
 
-    with {:error, _} <- File.ls(environment_path) do
-      {:error, :unknown_environment}
+      {:error, _} ->
+        {:error, :unknown_prefix}
     end
   end
 
@@ -22,77 +48,87 @@ defmodule SecretVault do
   Put `data` as a value of the secret `name` in the `environment`
   encrypted with the `key` and using the `config`.
   """
-  @spec put_secret(Config.t(), String.t(), String.t(), String.t(), String.t()) ::
-          :ok
-  def put_secret(config, key, environment, name, data)
-      when is_binary(key) and is_binary(environment) and is_binary(name) and
-             is_binary(data) do
-    key = config.key_derivation.kdf(key, config.key_derivation_opts)
-
+  @spec put(Config.t(), name(), value()) :: :ok | {:error, File.posix()}
+  def put(%Config{} = config, name, data) when is_binary(name) and is_binary(data) do
     encrypted_data =
-      config.encryption_provider.encrypt(
-        key,
+      config.cipher.encrypt(
+        config.key,
         data,
-        config.encryption_provider_opts
+        config.cipher_opts
       )
 
-    environment_path = FSResolver.resolve_environment_path(config, environment)
-    file_path = FSResolver.resolve_file_path(config, environment, name)
+    path = resolve_path(config)
+    file_path = resolve_path(config, name)
 
-    File.mkdir_p!(environment_path)
-    File.write!(file_path, encrypted_data)
+    with :ok <- File.mkdir_p(path) do
+      File.write(file_path, encrypted_data)
+    end
   end
 
   @doc """
   Fetch a clear text value of the secret `name` in the `environment`
   encrypted with the `key` and using the `config`.
   """
-  @spec fetch_secret(Config.t(), String.t(), String.t(), String.t()) ::
-          {:ok, String.t()} | {:error, error}
-        when error: :secret_not_found | :unknown_environment
-  def fetch_secret(config, key, environment, name)
-      when is_binary(key) and is_binary(environment) and is_binary(name) do
-    key = config.key_derivation.kdf(key, config.key_derivation_opts)
+  @spec fetch(Config.t(), name()) :: {:ok, value()} | {:error, reason()}
+  def fetch(%Config{} = config, name) when is_binary(name) do
+    at_path(config, name, fn file_path ->
+      encrypted_data = File.read!(file_path)
 
-    environment_path = FSResolver.resolve_environment_path(config, environment)
-    file_path = FSResolver.resolve_file_path(config, environment, name)
+      data =
+        config.cipher.decrypt(
+          config.key,
+          encrypted_data,
+          config.cipher_opts
+        )
 
-    cond do
-      not File.exists?(environment_path) ->
-        {:error, :unknown_environment}
+      {:ok, data}
+    end)
+  end
 
-      not File.exists?(file_path) ->
-        {:error, :secret_not_found}
-
-      true ->
-        encrypted_data = File.read!(file_path)
-
-        data =
-          config.encryption_provider.decrypt(
-            key,
-            encrypted_data,
-            config.encryption_provider_opts
-          )
-
-        {:ok, data}
+  @spec get(Config.t(), name(), default :: value()) :: value()
+  def get(%Config{} = config, name, default \\ "") do
+    case fetch(config, name) do
+      {:error, _} -> default
+      {:ok, data} -> data
     end
   end
 
   @doc """
   Remove secret `name` from the `environment`.
   """
-  @spec delete_secret(Config.t(), String.t(), String.t()) ::
-          :ok | {:error, error}
-        when error: :secret_not_found | :unknown_environment
-  def delete_secret(config, environment, name)
-      when is_binary(environment) and is_binary(name) do
-    environment_path = FSResolver.resolve_environment_path(config, environment)
-    file_path = FSResolver.resolve_file_path(config, environment, name)
+  @spec delete(Config.t(), name()) :: :ok | {:error, reason()}
+  def delete(%Config{} = config, name) when is_binary(name) do
+    at_path(config, name, &File.rm/1)
+  end
+
+  @doc """
+  Resolves a path to the `name` secret
+  """
+  @spec resolve_path(Config.t(), name()) :: Path.t()
+  def resolve_path(%Config{} = config, name) when is_binary(name) do
+    file_name = "#{name}.vault_secret"
+    Path.join [resolve_path(config), file_name]
+  end
+
+  @doc """
+  Resolves a path to the prefixed directory with secrets
+  """
+  @spec resolve_path(Config.t()) :: Path.t()
+  def resolve_path(%Config{priv_path: priv_path, env: env, prefix: prefix}) do
+    Path.join [priv_path, "secret_vault", env, prefix]
+  end
+
+  # Helpers
+
+  defp at_path(config, name, closure) do
+    path = resolve_path(config)
+    file_path = resolve_path(config, name)
 
     cond do
-      not File.exists?(environment_path) -> {:error, :unknown_environment}
-      not File.exists?(file_path) -> {:error, :secret_not_found}
-      true -> File.rm!(file_path)
+      File.exists?(file_path) -> closure.(file_path)
+      not File.exists?(path) -> {:error, :unknown_prefix}
+      true -> {:error, :secret_not_found}
     end
   end
+
 end

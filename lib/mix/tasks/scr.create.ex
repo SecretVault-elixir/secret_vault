@@ -8,49 +8,30 @@ defmodule Mix.Tasks.Scr.Create do
 
   ## Usage
 
-      mix scr.create prod database_url
+      mix scr.create prod database_password "My Super Secret Password"
   """
 
   @shortdoc "Create a new secret"
 
   use Mix.Task
 
-  alias SecretVault.{ConfigHelper, EditorHelper}
+  alias SecretVault.Config
+  import SecretVault.TaskHelper
 
   @default_editor "nano"
 
   @impl true
   def run(args)
 
-  def run([environment, name | rest]) do
-    key = ""
-
-    editor =
-      case System.get_env("EDITOR") do
-        nil -> @default_editor
-        "" -> @default_editor
-        value -> value
-      end
-
+  def run([env, name, data | rest]) do
     otp_app = Mix.Project.config()[:app]
-    prefix = find_prefix(rest)
+    prefix = find_option(rest, "p", "prefix") || "default"
 
-    with {:ok, config} <- ConfigHelper.fetch_config(otp_app, prefix),
-         {:ok, data} <- EditorHelper.open_new_file(editor) do
-      SecretVault.put_secret(config, key, environment, name, data)
+    with {:ok, config} <- fetch_config(otp_app, env, prefix) do
+      SecretVault.put(config, name, data)
     else
-      {:error, {:no_configuration_for_prefix, prefix}} ->
-        Mix.shell().error("No configuration for prefix #{prefix} found")
-
-      {:error, :no_vaults_configured} ->
-        Mix.shell().error("No vaults configured for the app")
-
-      {:error, :no_prefix_provided_when_multiple_configured} ->
-        message =
-          "No prefix provided when multiple configured. " <>
-            "Use --prefix option to specify the prefix"
-
-        Mix.shell().error(message)
+      :error ->
+        Mix.shell().error("Prefix #{inspect prefix} was not found")
 
       {:error, {:non_zero_exit_code, code, message}} ->
         Mix.shell().error("Non zero exit code #{code}: #{message}")
@@ -63,17 +44,5 @@ defmodule Mix.Tasks.Scr.Create do
   def run(_args) do
     msg = "Invalid number of arguments. Use `mix help scr.create`."
     Mix.shell().error(msg)
-  end
-
-  defp find_prefix(["--prefix", prefix | _rest]) do
-    prefix
-  end
-
-  defp find_prefix([_ | rest]) do
-    find_prefix(rest)
-  end
-
-  defp find_prefix([]) do
-    nil
   end
 end
