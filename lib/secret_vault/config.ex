@@ -124,10 +124,10 @@ defmodule SecretVault.Config do
   @doc """
   Same as `fetch_from_env/3`, but passes `env` authomatically.
   """
-  @spec fetch_from_env(atom(), Config.prefix()) ::
-          {:ok, Config.t()}
+  @spec fetch_from_env(atom(), prefix()) ::
+          {:ok, t()}
           | :error
-          | {:error, {:no_configuration_for_prefix, Config.prefix()}}
+          | {:error, {:no_configuration_for_prefix, prefix()}}
   def fetch_from_env(otp_app, prefix)
       when is_atom(otp_app) and is_binary(prefix) do
     fetch_from_env(otp_app, unquote(current_environment), prefix)
@@ -141,10 +141,10 @@ defmodule SecretVault.Config do
   value as a binary (string). `prefix` must be one of the configured
   prefixes.
   """
-  @spec fetch_from_env(atom(), String.t(), Config.prefix()) ::
-          {:ok, Config.t()}
+  @spec fetch_from_env(atom(), String.t(), prefix()) ::
+          {:ok, t()}
           | :error
-          | {:error, {:no_configuration_for_prefix, Config.prefix()}}
+          | {:error, {:no_configuration_for_prefix, prefix()}}
   def fetch_from_env(otp_app, env, prefix)
       when is_atom(otp_app) and is_binary(env) and is_binary(prefix) do
     with {:ok, prefixes} <- Application.fetch_env(otp_app, :secret_vault),

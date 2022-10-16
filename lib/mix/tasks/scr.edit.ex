@@ -15,7 +15,7 @@ defmodule Mix.Tasks.Scr.Edit do
 
   use Mix.Task
 
-  alias SecretVault.{Config, Editor, CLI}
+  alias SecretVault.{CLI, Config, Editor}
 
   @impl true
   def run(args)
