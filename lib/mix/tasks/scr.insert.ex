@@ -16,7 +16,7 @@ defmodule Mix.Tasks.Scr.Insert do
 
   use Mix.Task
 
-  alias SecretVault.{CLI, Config}
+  alias SecretVault.{CLI, Config, ErrorFormatter}
 
   @impl true
   def run(args)
@@ -32,15 +32,8 @@ defmodule Mix.Tasks.Scr.Insert do
       |> Keyword.put_new(:priv_path, CLI.priv_path())
 
     case Config.fetch_from_env(otp_app, env, prefix, config_opts) do
-      {:ok, config} ->
-        SecretVault.put(config, name, data)
-
-      {:error, {:no_configuration_for_app, otp_app}} ->
-        Mix.shell().error("No configuration for otp_app #{otp_app} found")
-
-      {:error, {:no_configuration_for_prefix, prefix}} ->
-        message = "No configuration for prefix #{inspect(prefix)} found"
-        Mix.shell().error(message)
+      {:ok, config} -> SecretVault.put(config, name, data)
+      {:error, error} -> Mix.shell().error(ErrorFormatter.format(error))
     end
   end
 

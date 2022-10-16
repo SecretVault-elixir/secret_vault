@@ -16,7 +16,7 @@ defmodule Mix.Tasks.Scr.Edit do
 
   use Mix.Task
 
-  alias SecretVault.{CLI, Config, Editor}
+  alias SecretVault.{CLI, Config, Editor, ErrorFormatter}
 
   @impl true
   def run(args)
@@ -37,38 +37,7 @@ defmodule Mix.Tasks.Scr.Edit do
          {:ok, updated_data} <- Editor.open_file_on_edit(original_data) do
       SecretVault.put(config, name, updated_data)
     else
-      {:error, {:no_configuration_for_prefix, prefix}} ->
-        message = "No configuration for prefix #{inspect(prefix)} found"
-        Mix.shell().error(message)
-
-      {:error, {:no_configuration_for_app, otp_app}} ->
-        Mix.shell().error("No configuration for otp_app #{otp_app} found")
-
-      {:error, {:non_zero_exit_code, code}} ->
-        Mix.shell().error("Non zero exit code #{code}")
-
-      {:error, {:executable_not_found, editor}} ->
-        Mix.shell().error("Editor not found: #{editor}")
-
-      {:error, :secret_not_found} ->
-        message =
-          "Secret #{name} not found in environment #{inspect(environment)}"
-
-        Mix.shell().error(message)
-
-      {:error, :invalid_encryption_key} ->
-        message =
-          "Invalid key. It seems the secret was encrypted with " <>
-            "a different encryption key"
-
-        Mix.shell().error(message)
-
-      {:error, :unknown_prefix} ->
-        message =
-          "Prefix #{inspect(prefix)} for environment #{inspect(environment)}" <>
-            " does not exist"
-
-        Mix.shell().error(message)
+      {:error, error} -> Mix.shell().error(ErrorFormatter.format(error))
     end
   end
 

@@ -27,7 +27,7 @@ defmodule Mix.Tasks.Scr.Show do
 
   use Mix.Task
 
-  alias SecretVault.{CLI, Config}
+  alias SecretVault.{CLI, Config, ErrorFormatter}
 
   @impl true
   def run(args)
@@ -46,29 +46,7 @@ defmodule Mix.Tasks.Scr.Show do
          {:ok, data} <- SecretVault.fetch(config, name) do
       Mix.shell().info(data)
     else
-      {:error, {:no_configuration_for_prefix, prefix}} ->
-        Mix.shell().error("No configuration for prefix #{prefix} found")
-
-      {:error, {:no_configuration_for_app, otp_app}} ->
-        Mix.shell().error("No configuration for otp_app #{otp_app} found")
-
-      {:error, :secret_not_found} ->
-        message = "Secret #{name} not found in environment #{env}"
-        Mix.shell().error(message)
-
-      {:error, :unknown_prefix} ->
-        message =
-          "Prefix #{inspect(prefix)} for environment #{inspect(env)}" <>
-            " does not exist"
-
-        Mix.shell().error(message)
-
-      {:error, :invalid_encryption_key} ->
-        message =
-          "Invalid key. It seems the secret was encrypted with " <>
-            "a different encryption key"
-
-        Mix.shell().error(message)
+      {:error, error} -> Mix.shell().error(ErrorFormatter.format(error))
     end
   end
 
@@ -81,16 +59,7 @@ defmodule Mix.Tasks.Scr.Show do
       message = Enum.join(names, "\n")
       Mix.shell().info(message)
     else
-      {:error, {:no_configuration_for_prefix, prefix}} ->
-        message = "No configuration for prefix #{inspect(prefix)} found"
-        Mix.shell().error(message)
-
-      {:error, :unknown_prefix} ->
-        message =
-          "Prefix #{inspect(prefix)} for environment #{inspect(environment)}" <>
-            " does not exist"
-
-        Mix.shell().error(message)
+      {:error, error} -> Mix.shell().error(ErrorFormatter.format(error))
     end
   end
 
