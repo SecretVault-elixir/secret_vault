@@ -124,11 +124,11 @@ defmodule SecretVault.Config do
   @doc """
   Same as `fetch_from_env/3`, but passes `env` authomatically.
   """
-  @spec fetch_from_env(atom(), prefix()) ::
+  @spec fetch_from_current_env(atom(), prefix()) ::
           {:ok, t()}
           | {:error, {:no_configuration_for_app, otp_app :: module}}
           | {:error, {:no_configuration_for_prefix, prefix()}}
-  def fetch_from_env(otp_app, prefix)
+  def fetch_from_current_env(otp_app, prefix)
       when is_atom(otp_app) and is_binary(prefix) do
     fetch_from_env(otp_app, unquote(current_environment), prefix)
   end
