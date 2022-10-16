@@ -1,4 +1,4 @@
-priv = to_string :code.priv_dir :secret_vault
-File.mkdir_p priv
+priv = to_string(:code.priv_dir(:secret_vault))
+File.mkdir_p(priv)
 ExUnit.start()
-File.rm_rf! priv
+File.rm_rf!(priv)
