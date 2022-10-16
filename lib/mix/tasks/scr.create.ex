@@ -7,29 +7,35 @@ defmodule Mix.Tasks.Scr.Create do
   so on.
 
   ## Usage
-
-      mix scr.create prod database_password "My Super Secret Password"
+      mix scr.create prod database_url
   """
 
   @shortdoc "Create a new secret"
 
   use Mix.Task
 
-  import SecretVault.TaskHelper
+  alias SecretVault.{EditorHelper, TaskHelper}
 
   @impl true
   def run(args)
 
-  def run([env, name, data | rest]) do
+  def run([environment, name | rest]) do
     otp_app = Mix.Project.config()[:app]
-    prefix = find_option(rest, "p", "prefix") || "default"
+    prefix = TaskHelper.find_option(rest, "p", "prefix") || "default"
 
-    case fetch_config(otp_app, env, prefix) do
-      {:ok, config} ->
-        SecretVault.put(config, name, data)
+    with {:ok, config} <- TaskHelper.fetch_config(otp_app, environment, prefix),
+         {:ok, data} <- EditorHelper.open_new_file() do
+      SecretVault.put(config, name, data)
+    else
+      {:error, {:no_configuration_for_prefix, prefix}} ->
+        message = "No configuration for prefix #{inspect(prefix)} found"
+        Mix.shell().error(message)
 
-      :error ->
-        Mix.shell().error("Prefix #{inspect(prefix)} was not found")
+      {:error, {:non_zero_exit_code, code, message}} ->
+        Mix.shell().error("Non zero exit code #{code}: #{message}")
+
+      {:error, {:executable_not_found, editor}} ->
+        Mix.shell().error("Editor not found: #{editor}")
     end
   end
 
