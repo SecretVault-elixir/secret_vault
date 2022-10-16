@@ -3,13 +3,15 @@ defmodule SecretVault.Config do
   Keeps configuration for a `SecretVault.Storage`.
   """
 
-  defstruct [:key, :env] ++
-              [
-                cipher: SecretVault.Cipher.ErlangCrypto,
-                cipher_opts: [],
-                priv_path: nil,
-                prefix: "default"
-              ]
+  @struct_keys [:key, :env] ++
+                 [
+                   cipher: SecretVault.Cipher.ErlangCrypto,
+                   cipher_opts: [],
+                   priv_path: nil,
+                   prefix: "default"
+                 ]
+
+  defstruct @struct_keys
 
   @typedoc """
   A module implementing `SecretVault.EncryptionProvider` behaviour.
@@ -192,5 +194,21 @@ defmodule SecretVault.Config do
         prefix: "#{:erlang.unique_integer([:positive])}"
       )
     end
+  end
+
+  struct_opts =
+    Enum.map(@struct_keys, fn
+      {k, _} -> k
+      k -> k
+    end)
+
+  all_opts = struct_opts ++ [:password]
+
+  @doc """
+  Return list of options available for config.
+  """
+  @spec available_options :: [atom]
+  def available_options do
+    unquote(all_opts)
   end
 end

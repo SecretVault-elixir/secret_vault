@@ -35,7 +35,13 @@ defmodule Mix.Tasks.Scr.Show do
     otp_app = Mix.Project.config()[:app]
     prefix = CLI.find_option(rest, "p", "prefix") || "default"
 
-    with {:ok, config} <- Config.fetch_from_env(otp_app, env, prefix),
+    config_opts =
+      Config.available_options()
+      |> Enum.map(&{&1, CLI.find_option(rest, nil, "#{&1}")})
+      |> Enum.reject(fn {_, value} -> is_nil(value) end)
+
+    with {:ok, config} <-
+           Config.fetch_from_env(otp_app, env, prefix, config_opts),
          {:ok, data} <- SecretVault.fetch(config, name) do
       Mix.shell().info(data)
     else
