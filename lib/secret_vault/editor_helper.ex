@@ -51,7 +51,7 @@ defmodule SecretVault.EditorHelper do
   defp accuire_tmp_file! do
     tmp_file_name = Base.encode16(:crypto.strong_rand_bytes(16))
     tmp_path = Path.join(System.tmp_dir!(), tmp_file_name)
-    tmp_base_path = Path.basename(tmp_path)
+    tmp_base_path = Path.dirname(tmp_path)
     File.mkdir_p!(tmp_base_path)
     tmp_path
   end
