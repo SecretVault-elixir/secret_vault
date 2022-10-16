@@ -1,13 +1,13 @@
 defmodule Mix.Tasks.Scr.Show do
   @moduledoc """
-  Shows an existing secret in specified environment and under
-  specified name.
+  Shows an existing secret in the specified environment and under
+  the specified name.
 
   If the name of a secret is not provided, it lists all the existing
   secrets.
 
-  It uses configuration of current application to retrieve keys and
-  so on.
+  It uses configuration of the current application to retrieve the
+  keys and so on.
 
   ## Usage
 

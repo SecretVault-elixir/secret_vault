@@ -3,6 +3,8 @@ defmodule SecretVault.Cipher.ErlangCrypto do
   Encryption provider that uses `:crypto` module.
 
   Implements `SecretVault.Cipher`.
+
+  As for now it uses `:aes_256_gcm` mode as default and only option.
   """
 
   import :crypto,

@@ -2,8 +2,12 @@ defmodule SecretVault.Cipher.Plaintext do
   @moduledoc """
   Stores passwords in plaintext.
 
-  **WARNING!!!** This cipher is insecure and supposed to be used only in testing
-  or self encrypting filesystems.
+  Implements `SecretVault.Cipher`.
+
+  > #### Warning {: .warning }
+  >
+  > This cipher is insecure and supposed to be used only in testing
+  > or self encrypting filesystems.
   """
 
   alias SecretVault.Cipher
