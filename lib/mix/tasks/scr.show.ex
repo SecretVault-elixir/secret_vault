@@ -20,6 +20,15 @@ defmodule Mix.Tasks.Scr.Show do
 
       mix scr.show prod
 
+  ## Config override
+
+  You can override config options by providing command line arguments.
+
+  - `:cipher` - specify a cipher to use;
+  - `:priv_path` - path to `priv` directory;
+  - `:prefix` - prefix to use (defaults to `default`);
+  - `:password` - use a password that's different from the one that's
+    configured.
   """
 
   @shortdoc "Show an existing secret or list all the ones"

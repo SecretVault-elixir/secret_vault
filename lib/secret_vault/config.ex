@@ -197,7 +197,9 @@ defmodule SecretVault.Config do
       k -> k
     end)
 
-  all_opts = struct_opts ++ [:password]
+  all_opts =
+    [:password] ++
+      (struct_opts -- [:cipher_opts, :key_derivation_opts, :key, :env])
 
   @doc """
   Return list of options available for config.
