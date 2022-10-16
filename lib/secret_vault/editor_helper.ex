@@ -38,8 +38,8 @@ defmodule SecretVault.EditorHelper do
 
   defp do_open_file_on_edit(editor, tmp_path) do
     with exe when not is_nil(exe) <- System.find_executable(editor),
-         {_, 0} <- System.cmd(editor, [tmp_path]) do
-      :ok
+         running_editor <- run_editor(exe, tmp_path) do
+      await_editor(running_editor)
     else
       nil -> {:error, {:executable_not_found, editor}}
       {msg, code} -> {:error, {:non_zero_exit_code, code, msg}}
@@ -49,6 +49,29 @@ defmodule SecretVault.EditorHelper do
       {:error, {:executable_not_found, editor}}
   end
 
+  # Starts editor instance in a separate port
+  defp run_editor(editor_path, tmp_path) do
+    Port.open({:spawn_executable, editor_path}, [
+      :nouse_stdio,
+      :exit_status,
+      :eof,
+      args: [tmp_path]
+    ])
+  end
+
+  # Awaits exit code from the editor for 10 minutes
+  defp await_editor(port, timeout \\ 10 * 60_000) do
+    receive do
+      {^port, {:exit_status, 0}} -> :ok
+      {^port, {:exit_status, status}} -> {:error, {:non_zero_exit_code, status}}
+    after
+      timeout ->
+        Port.close(port)
+        {:error, :timeout}
+    end
+  end
+
+  # Searches for the editor command in EDITOR, VISUAL and xdg-open command
   defp find_editor do
     editor_candidates = [
       System.get_env("VISUAL"),
@@ -59,6 +82,7 @@ defmodule SecretVault.EditorHelper do
     Enum.find(editor_candidates, &(&1 not in [nil, ""]))
   end
 
+  # Creates a protected file in tmp upon which the editor will be called
   defp accuire_tmp_file! do
     tmp_file_name = Base.encode16(:crypto.strong_rand_bytes(16)) <> ".txt"
     tmp_path = Path.join(System.tmp_dir!(), tmp_file_name)

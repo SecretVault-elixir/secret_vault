@@ -25,7 +25,7 @@ defmodule SecretVault do
   extension = ".vault_secret"
 
   @doc """
-  Show secrets available in the `environment`.
+  Show secrets' names available.
   """
   @spec list(Config.t()) :: {:ok, [String.t()]} | {:error, :unknown_prefix}
   def list(%Config{} = config) do
@@ -47,8 +47,7 @@ defmodule SecretVault do
   end
 
   @doc """
-  Put `data` as a value of the secret `name` in the `environment`
-  encrypted with the `key` and using the `config`.
+  Put `data` as a value of the secret `name` using the `config`.
   """
   @spec put(Config.t(), name(), value()) :: :ok | {:error, File.posix()}
   def put(%Config{} = config, name, data)
@@ -69,8 +68,7 @@ defmodule SecretVault do
   end
 
   @doc """
-  Fetch a clear text value of the secret `name` in the `environment`
-  encrypted with the `key` and using the `config`.
+  Fetch a clear text value of the secret `name` using the `config`.
   """
   @spec fetch(Config.t(), name()) :: {:ok, value()} | {:error, reason()}
   def fetch(%Config{} = config, name) when is_binary(name) do
@@ -85,6 +83,33 @@ defmodule SecretVault do
         )
 
       {:ok, data}
+    end)
+  end
+
+  @doc """
+  Fetch a clear text value of the secret `name` using the `config`.
+  Raises if no secret with the `name` found
+  """
+  @spec fetch!(Config.t(), name()) :: value()
+  def fetch!(%Config{} = config, name) do
+    case fetch(config, name) do
+      {:ok, data} ->
+        data
+
+      # TODO
+      {:error, _reason} ->
+        raise "NO!"
+    end
+  end
+
+  @doc """
+  Asynchronously fetches all secrets from the vault
+  """
+  @spec fetch_all(Config.t()) ::
+          {:ok, %{name() => value()}} | {:error, {name(), reason()}}
+  def fetch_all(%Config{} = config) do
+    at_all_names(config, {:ok, %{}}, fn name, value, {:ok, acc} ->
+      {:cont, {:ok, Map.put(acc, name, value)}}
     end)
   end
 
@@ -125,6 +150,7 @@ defmodule SecretVault do
 
   # Helpers
 
+  @spec at_path(Config.t(), name(), (Path.t() -> any())) :: any()
   defp at_path(config, name, closure) do
     path = resolve_environment_path(config)
     file_path = resolve_secret_path(config, name)
@@ -133,6 +159,31 @@ defmodule SecretVault do
       File.exists?(file_path) -> closure.(file_path)
       not File.exists?(path) -> {:error, :unknown_prefix}
       true -> {:error, :secret_not_found}
+    end
+  end
+
+  @spec at_all_names(
+          Config.t(),
+          acc,
+          (name(), value(), acc -> {:cont, acc} | {:halt, res})
+        ) :: acc | res | {:error, {name, reason}}
+        when acc: any(), res: any()
+  defp at_all_names(config, acc, closure) do
+    with {:ok, list} <- list(config) do
+      list
+      |> Task.async_stream(
+        fn name -> {name, fetch(config, name)} end,
+        # Because file operations are concurrent
+        max_concurrency: System.schedulers_online() * 8,
+        ordered: false
+      )
+      |> Enum.reduce_while(acc, fn
+        {:ok, {name, {:ok, value}}}, {:ok, acc} ->
+          closure.(name, value, acc)
+
+        {:ok, {name, {:error, reason}}}, _acc ->
+          {:halt, {:error, {name, reason}}}
+      end)
     end
   end
 end

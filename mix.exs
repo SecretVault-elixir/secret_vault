@@ -49,11 +49,11 @@ defmodule SecretVault.MixProject do
   defp docs do
     [
       source_ref: "v#{@version}",
-      main: "readme"
+      main: "readme",
 
       # TODO
       # extra_section: "GUIDES",
-      # extras: ["README.md" | Path.wildcard("guides/*/*")] ++ ["CHANGELOG.md"],
+      extras: ["README.md", "CHANGELOG.md"]
 
       # groups_for_modules: groups_for_modules(),
       # groups_for_extras: groups_for_extras()

@@ -8,10 +8,6 @@ defmodule SecretVault.TaskHelper do
           {:ok, Config.t()}
           | :error
           | {:error, {:no_configuration_for_prefix, Config.prefix()}}
-  def fetch_config(otp_app, env, nil) do
-    fetch_config(otp_app, env, "default")
-  end
-
   def fetch_config(otp_app, env, prefix) do
     with {:ok, prefixes} <- Application.fetch_env(otp_app, :secret_vault),
          {:ok, opts} <- find_prefix(prefixes, prefix) do
@@ -47,6 +43,16 @@ defmodule SecretVault.TaskHelper do
 
   def find_option(["-" <> short, value | _rest], short, _option) do
     value
+  end
+
+  def find_option(["--" <> flag | rest], short, option) do
+    case String.split(flag, "=") do
+      [^option, value] ->
+        value
+
+      _ ->
+        find_option(rest, short, option)
+    end
   end
 
   def find_option([_ | rest], short, option) do

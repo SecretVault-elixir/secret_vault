@@ -26,16 +26,15 @@ defmodule Mix.Tasks.Scr.Edit do
 
     with {:ok, config} <- TaskHelper.fetch_config(otp_app, environment, prefix),
          {:ok, original_data} <- SecretVault.fetch(config, name),
-         {:ok, updated_data} <-
-           EditorHelper.open_file_on_edit(original_data) do
+         {:ok, updated_data} <- EditorHelper.open_file_on_edit(original_data) do
       SecretVault.put(config, name, updated_data)
     else
       {:error, {:no_configuration_for_prefix, prefix}} ->
         message = "No configuration for prefix #{inspect(prefix)} found"
         Mix.shell().error(message)
 
-      {:error, {:non_zero_exit_code, code, message}} ->
-        Mix.shell().error("Non zero exit code #{code}: #{message}")
+      {:error, {:non_zero_exit_code, code}} ->
+        Mix.shell().error("Non zero exit code #{code}")
 
       {:error, {:executable_not_found, editor}} ->
         Mix.shell().error("Editor not found: #{editor}")

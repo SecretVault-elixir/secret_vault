@@ -56,8 +56,8 @@ defmodule Mix.Tasks.Scr.Show do
     prefix = TaskHelper.find_option(rest, "p", "prefix") || "default"
 
     with {:ok, config} <- TaskHelper.fetch_config(otp_app, environment, prefix),
-         {:ok, secrets} <- SecretVault.list(config) do
-      message = Enum.join(secrets, "\n")
+         {:ok, names} <- SecretVault.list(config) do
+      message = Enum.join(names, "\n")
       Mix.shell().info(message)
     else
       {:error, {:no_configuration_for_prefix, prefix}} ->
