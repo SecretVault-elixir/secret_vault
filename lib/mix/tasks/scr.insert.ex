@@ -24,12 +24,17 @@ defmodule Mix.Tasks.Scr.Insert do
     otp_app = Mix.Project.config()[:app]
     prefix = CLI.find_option(rest, "p", "prefix") || "default"
 
-    case Config.fetch_from_env(otp_app, env, prefix) do
+    config_opts =
+      Config.available_options()
+      |> Enum.map(&{&1, CLI.find_option(rest, nil, "#{&1}")})
+      |> Enum.reject(fn {_, value} -> is_nil(value) end)
+
+    case Config.fetch_from_env(otp_app, env, prefix, config_opts) do
       {:ok, config} ->
         SecretVault.put(config, name, data)
 
-      :error ->
-        Mix.shell().error("No configuration found")
+      {:error, {:no_configuration_for_app, otp_app}} ->
+        Mix.shell().error("No configuration for otp_app #{otp_app} found")
 
       {:error, {:no_configuration_for_prefix, prefix}} ->
         message = "No configuration for prefix #{inspect(prefix)} found"

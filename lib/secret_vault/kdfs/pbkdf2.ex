@@ -37,7 +37,6 @@ defmodule SecretVault.KDFs.PBKDF2 do
   cond do
     Code.ensure_loaded?(:crypto) && function_exported?(:crypto, :pbkdf2_hmac, 5) ->
       # Note: This function is only available since OTP 24.2.
-      # credo:disable-for-next-line Credo.Check.Refactor.Apply
       defp do_kdf(user_input, salt, iterations_count, key_length) do
         :crypto.pbkdf2_hmac(
           :sha512,

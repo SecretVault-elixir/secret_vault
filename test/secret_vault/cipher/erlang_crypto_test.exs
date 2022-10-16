@@ -8,7 +8,7 @@ defmodule SecretVault.Cipher.ErlangCryptoTest do
     text = "test"
 
     c = ErlangCrypto.encrypt(key, text, [])
-    p = ErlangCrypto.decrypt(key, c, [])
+    assert {:ok, p} = ErlangCrypto.decrypt(key, c, [])
 
     assert p == text
   end

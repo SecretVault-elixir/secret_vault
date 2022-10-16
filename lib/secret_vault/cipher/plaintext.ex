@@ -16,6 +16,6 @@ defmodule SecretVault.Cipher.Plaintext do
   @impl true
   def decrypt(_key, cipher_text, _opts) do
     splitted_plaintext = Cipher.unpack!("PLAIN", cipher_text)
-    Enum.join(splitted_plaintext, ";")
+    {:ok, Enum.join(splitted_plaintext, ";")}
   end
 end
