@@ -118,4 +118,21 @@ defmodule SecretVault.Config do
 
     struct(__MODULE__, [{:key, key} | opts])
   end
+
+  # TODO
+  # def from_env(app_name, opts \\ []) do
+  #   key = Keyword.get(opts, :key, :secret_vault)
+  #   env = Application.fetch_env!(app_name,
+  # end
+
+  # This function is required primarily for doctests
+  if Code.ensure_loaded?(Mix) && function_exported?(Mix, :env, 0) &&
+       Mix.env() == :test do
+    def test_config do
+      new(:secret_vault,
+        password: "123456",
+        prefix: "#{:erlang.unique_integer([:positive])}"
+      )
+    end
+  end
 end

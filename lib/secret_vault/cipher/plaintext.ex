@@ -15,13 +15,7 @@ defmodule SecretVault.Cipher.Plaintext do
 
   @impl true
   def decrypt(_key, cipher_text, _opts) do
-    case Cipher.unpack(cipher_text) do
-      {:ok, "PLAIN", plaintext} ->
-        Enum.join(plaintext, ";")
-
-      _ ->
-        # TODO
-        raise "Bad base16"
-    end
+    splitted_plaintext = Cipher.unpack!("PLAIN", cipher_text)
+    Enum.join(splitted_plaintext, ";")
   end
 end

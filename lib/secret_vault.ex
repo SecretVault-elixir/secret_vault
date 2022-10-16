@@ -178,7 +178,7 @@ defmodule SecretVault do
         ordered: false
       )
       |> Enum.reduce_while(acc, fn
-        {:ok, {name, {:ok, value}}}, {:ok, acc} ->
+        {:ok, {name, {:ok, value}}}, acc ->
           closure.(name, value, acc)
 
         {:ok, {name, {:error, reason}}}, _acc ->

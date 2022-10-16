@@ -17,6 +17,7 @@ defmodule SecretVault.Cipher.ErlangCrypto do
   @behaviour Cipher
 
   @default_cipher :aes_256_gcm
+  @default_cipher_name "ErlangCrypto"
 
   @impl true
   def encrypt(key, plain_text, _opts) do
@@ -33,13 +34,13 @@ defmodule SecretVault.Cipher.ErlangCrypto do
         true
       )
 
-    Cipher.pack("AES256GCM", [iv, aad, meta, encrypted_plain_text])
+    Cipher.pack(@default_cipher_name, [iv, aad, meta, encrypted_plain_text])
   end
 
   @impl true
   def decrypt(key, cipher_text, _opts) do
-    case Cipher.unpack(cipher_text) do
-      {:ok, "AES256GCM", [iv, aad, meta, encrypted_plain_text]} ->
+    case Cipher.unpack!(@default_cipher_name, cipher_text) do
+      [iv, aad, meta, encrypted_plain_text] ->
         crypto_one_time_aead(
           @default_cipher,
           key,
@@ -50,9 +51,9 @@ defmodule SecretVault.Cipher.ErlangCrypto do
           false
         )
 
-      _ ->
-        # TODO
-        raise "Bad base16"
+      list ->
+        raise Cipher.Error,
+              "Wrong amount of properties. Expected five props: iv, aad, meta, encrypted_plain_text. Got #{length(list)}"
     end
   end
 end
