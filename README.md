@@ -19,3 +19,13 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/secret_vault>.
 
+## Development
+
+If you want to contribute to the project or just want to test it
+localy (not via dependencies), you need to create `config/config.exs`
+file with following content
+
+```elixir
+config :secret_vault, :secret_vault,
+  default: []
+```
