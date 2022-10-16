@@ -8,7 +8,8 @@ defmodule SecretVault.FSResolver do
   @spec resolve_file_path(Config.t(), String.t(), String.t()) :: String.t()
   def resolve_file_path(config, environment, name)
       when is_map(config) and is_binary(environment) and is_binary(name) do
-    Path.join([resolve_environment_path(config, environment), name])
+    file_name = "#{name}.vault_secret"
+    Path.join([resolve_environment_path(config, environment), file_name])
   end
 
   @spec resolve_environment_path(Config.t(), String.t()) :: String.t()
