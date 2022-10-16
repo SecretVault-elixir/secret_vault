@@ -96,6 +96,17 @@ defmodule SecretVault do
     at_path(config, name, &File.rm/1)
   end
 
+  @doc """
+  Tell whether the secret `name` exists.
+  """
+  @spec exists?(Config.t(), name()) :: boolean()
+  def exists?(config, name) do
+    case at_path(config, name, &{:ok, &1}) do
+      {:ok, _} -> true
+      {:error, _} -> false
+    end
+  end
+
   # Resolves a path to the `name` secret
   @doc false
   @spec resolve_secret_path(Config.t(), name()) :: Path.t()

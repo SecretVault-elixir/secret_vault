@@ -24,9 +24,13 @@ defmodule Mix.Tasks.Scr.Create do
     prefix = TaskHelper.find_option(rest, "p", "prefix") || "default"
 
     with {:ok, config} <- TaskHelper.fetch_config(otp_app, environment, prefix),
+         :ok <- ensure_secret_doesn_not_exist(config, name),
          {:ok, data} <- EditorHelper.open_new_file() do
       SecretVault.put(config, name, data)
     else
+      {:error, :secret_already_exists} ->
+        Mix.shell().error("Secret with name #{name} already exists")
+
       {:error, {:no_configuration_for_prefix, prefix}} ->
         message = "No configuration for prefix #{inspect(prefix)} found"
         Mix.shell().error(message)
@@ -42,5 +46,13 @@ defmodule Mix.Tasks.Scr.Create do
   def run(_args) do
     msg = "Invalid number of arguments. Use `mix help scr.create`."
     Mix.shell().error(msg)
+  end
+
+  defp ensure_secret_doesn_not_exist(config, name) do
+    if SecretVault.exists?(config, name) do
+      {:error, :secret_already_exists}
+    else
+      :ok
+    end
   end
 end
