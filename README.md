@@ -5,8 +5,7 @@ All-in-one solution for storing your Elixir application secrets inside the repos
 ## Features
 
 * **Standalone**. No dependencies on external binaries.
-* **Secure**. Uses `aes256gcm` cipher by default. Performs audit to
-  detect weak and duplicate passwords using `mix scr.audit` task.
+* **Secure**. Uses `aes256gcm` cipher by default. Detects weak and similar passwords with `mix scr.audit` task.
 * **Developer friendly**. You can use `mix scr.*` tasks to create or
   edit secrets in your favourit editor. Or you can use simple
   coreutils like `mv`, `rm`, `cp`.
@@ -14,7 +13,7 @@ All-in-one solution for storing your Elixir application secrets inside the repos
   tutorials take no more than 5 minutes to read.
 * **VCS friendly**. `SecretVault` stores secrets in separate files,
   thus makes it easily to track in VCS.
-* **Mix friendly**. `SecretVault` enforces you to separate secrets for
+* **Mix friendly**. `SecretVault` enforces separation of secrets for
   different environments.
 * **Extensible**. You can connect your own ciphers, vaults or key
   derivation functions.
@@ -23,10 +22,13 @@ All-in-one solution for storing your Elixir application secrets inside the repos
 
 ## Usage
 
-Check out our [tutorials](https://hexdocs.pm/secret_vault/usage.html)
-for usage and extension APIs.
+Check out our [tutorials](https://github.com/spawnfest/secret_vault/blob/main/guides/tutorials/usage.md)
+for usage and extension APIs. And build the documenation with `mix docs` since the project has not been
+published as a package yet.
 
 ## Installation
+
+Just add it to the list of dependencies like
 
 ```elixir
 def deps do
@@ -39,10 +41,10 @@ end
 ## Development
 
 If you want to contribute to the project or just want to test it
-localy (not via dependencies), you need to create `config/config.exs`
+localy (not as a dependency), you'll need to create `config/config.exs`
 file with following content.
 
 ```elixir
 config :secret_vault, :secret_vault,
-  default: [password: "testtest"]
+  default: [password: "Some super secret"]
 ```

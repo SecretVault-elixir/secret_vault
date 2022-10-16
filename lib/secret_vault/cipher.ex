@@ -40,7 +40,7 @@ defmodule SecretVault.Cipher do
 
   defmodule Error do
     @moduledoc """
-    This exception gets raised when some error occurs during decoding.
+    This exception gets raised when some error occurs during decoding of an encrypted secret.
     """
     defexception [:message]
   end

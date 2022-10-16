@@ -1,6 +1,6 @@
 defmodule Mix.Tasks.Scr.Audit do
   @moduledoc """
-  Performs audit of passwords to detect duplicates and weak passwords.
+  Performs audit of passwords, detect duplicates and weak passwords.
   Exits with 1 exit code if at least one check fails.
 
   ## Check options
@@ -9,6 +9,7 @@ defmodule Mix.Tasks.Scr.Audit do
   - `--digits` - to enforce passwords having at least one digit
   - `--uppercase` - to enforce uppercase letters in password
   - `--mix-length=N` - to enforce minimul length requirement
+  - `--no-plaintext` - to disable checking for unencrypted passwords
 
   ## Config override
 
@@ -81,7 +82,9 @@ defmodule Mix.Tasks.Scr.Audit do
   end
 
   defp check(secrets, args) do
-    plaintext_check(secrets)
+    unless "--no-plaintext" in args do
+      plaintext_check(secrets)
+    end
 
     unless "--no-similarity" in args do
       similarity_check(secrets)

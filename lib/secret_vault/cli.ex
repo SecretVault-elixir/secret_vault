@@ -2,9 +2,12 @@ defmodule SecretVault.CLI do
   @moduledoc false
   # This module is a set of helpers for tasks
 
+  @doc """
+  Scans the list of `argv` to find the option in a short or long format
+  """
   @spec find_option([String.t()], String.t() | nil, String.t()) ::
           String.t() | nil
-  def find_option(args, short, option)
+  def find_option(argv, short, option)
 
   def find_option(["--" <> option, value | _rest], _short, option)
       when is_binary(option) do

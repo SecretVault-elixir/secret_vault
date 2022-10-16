@@ -1,6 +1,8 @@
 defmodule SecretVault.Config do
   @moduledoc """
-  Keeps configuration for a `SecretVault.Storage`.
+  Configuration for a `SecretVault` vault. This configuration
+  defines ciphers, their options, holds simmetric encryption key
+  and path to the vault.
   """
 
   @struct_keys [:key, :env] ++

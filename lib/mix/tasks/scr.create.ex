@@ -7,6 +7,7 @@ defmodule Mix.Tasks.Scr.Create do
   keys and other options.
 
   ## Usage
+
       mix scr.create prod database_url
 
   ## Config override

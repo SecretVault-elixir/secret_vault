@@ -76,7 +76,7 @@ defmodule MyApp.Application do
 
   def start(_type, _args) do
     ...
-    {:ok, config} = SecretVault.Config.fetch_from_env(:my_app)
+    {:ok, config} = SecretVault.Config.fetch_from_current_env(:my_app)
     SecretVault.Storage.to_persistent_term(config)
   end
 end

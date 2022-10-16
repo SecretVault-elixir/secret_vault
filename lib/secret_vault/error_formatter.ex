@@ -2,6 +2,7 @@ defmodule SecretVault.ErrorFormatter do
   @moduledoc false
   # Manages rendering errors in CLI
 
+  @spec format(any()) :: String.t()
   def format({:unknown_prefix, prefix, environment}) do
     "Prefix #{inspect(prefix)} for environment #{inspect(environment)}" <>
       " does not exist"
