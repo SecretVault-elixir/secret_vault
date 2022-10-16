@@ -8,13 +8,13 @@ defmodule SecretVault.TaskHelper do
           {:ok, Config.t()}
           | :error
           | {:error, {:no_configuration_for_prefix, Config.prefix()}}
-  def fetch_config(otp_app, env, nil), do: fetch_config(otp_app, env, "default")
+  def fetch_config(otp_app, env, nil) do
+    fetch_config(otp_app, env, "default")
+  end
 
   def fetch_config(otp_app, env, prefix) do
-    with(
-      {:ok, prefixes} <- Application.fetch_env(otp_app, :secret_vault),
-      {:ok, opts} <- find_prefix(prefixes, prefix)
-    ) do
+    with {:ok, prefixes} <- Application.fetch_env(otp_app, :secret_vault),
+         {:ok, opts} <- find_prefix(prefixes, prefix) do
       priv_dir = File.cwd!()
 
       opts =
@@ -27,8 +27,9 @@ defmodule SecretVault.TaskHelper do
     end
   end
 
-  defp find_prefix([], prefix),
-    do: {:error, {:no_configuration_for_prefix, prefix}}
+  defp find_prefix([], prefix) do
+    {:error, {:no_configuration_for_prefix, prefix}}
+  end
 
   defp find_prefix([{atom_prefix, opts} | rest], prefix) do
     case to_string(atom_prefix) do
@@ -38,11 +39,21 @@ defmodule SecretVault.TaskHelper do
   end
 
   @spec find_option([String.t()], String.t(), String.t()) :: String.t() | nil
-  def find_option(["--" <> option, value | _rest], _short, option), do: value
-  def find_option(["-" <> short, value | _rest], short, _option), do: value
+  def find_option(args, short, option)
 
-  def find_option([_ | rest], short, option),
-    do: find_option(rest, short, option)
+  def find_option(["--" <> option, value | _rest], _short, option) do
+    value
+  end
 
-  def find_option([], _, _), do: nil
+  def find_option(["-" <> short, value | _rest], short, _option) do
+    value
+  end
+
+  def find_option([_ | rest], short, option) do
+    find_option(rest, short, option)
+  end
+
+  def find_option([], _, _) do
+    nil
+  end
 end

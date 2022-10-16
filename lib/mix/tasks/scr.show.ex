@@ -26,16 +26,16 @@ defmodule Mix.Tasks.Scr.Show do
 
   use Mix.Task
 
-  import SecretVault.TaskHelper
+  alias SecretVault.TaskHelper
 
   @impl true
   def run(args)
 
   def run([env, name | rest]) do
     otp_app = Mix.Project.config()[:app]
-    prefix = find_option(rest, "p", "prefix") || "default"
+    prefix = TaskHelper.find_option(rest, "p", "prefix") || "default"
 
-    with {:ok, config} <- fetch_config(otp_app, env, prefix),
+    with {:ok, config} <- TaskHelper.fetch_config(otp_app, env, prefix),
          {:ok, data} <- SecretVault.fetch(config, name) do
       Mix.shell().info(data)
     else
@@ -51,30 +51,25 @@ defmodule Mix.Tasks.Scr.Show do
     end
   end
 
-  def run([env | rest]) do
+  def run([environment | rest]) do
     otp_app = Mix.Project.config()[:app]
-    prefix = find_option(rest, "p", "prefix") || "default"
+    prefix = TaskHelper.find_option(rest, "p", "prefix") || "default"
 
-    with {:ok, config} <- fetch_config(otp_app, env, prefix),
+    with {:ok, config} <- TaskHelper.fetch_config(otp_app, environment, prefix),
          {:ok, secrets} <- SecretVault.list(config) do
       message = Enum.join(secrets, "\n")
       Mix.shell().info(message)
     else
       {:error, {:no_configuration_for_prefix, prefix}} ->
-        Mix.shell().error("No configuration for prefix #{prefix} found")
-
-      {:error, :no_vaults_configured} ->
-        Mix.shell().error("No vaults configured for the app")
-
-      {:error, :no_prefix_provided_when_multiple_configured} ->
-        message =
-          "No prefix provided when multiple configured. " <>
-            "Use --prefix option to specify the prefix"
-
+        message = "No configuration for prefix #{inspect(prefix)} found"
         Mix.shell().error(message)
 
-      {:error, :unknown_environment} ->
-        Mix.shell().error("Environment #{env} does not exist")
+      {:error, :unknown_prefix} ->
+        message =
+          "Prefix #{inspect(prefix)} for environment #{inspect(environment)}" <>
+            " does not exist"
+
+        Mix.shell().error(message)
     end
   end
 
