@@ -127,28 +127,24 @@ defmodule SecretVault.Config do
     struct(__MODULE__, [{:key, key} | opts])
   end
 
-  current_environment = "#{Mix.env()}"
-
   @doc """
   Same as `fetch_from_env/3`, but passes `env` authomatically.
+  Fetch config from the application configuration (e.g. in
+  `confix.exs`).
+
+  `otp_app` is the current OTP application name.
+  `prefix` must be one of the configured prefixes.
   """
   @spec fetch_from_current_env(atom, prefix, [config_option]) ::
           {:ok, t}
           | {:error, {:no_configuration_for_app, otp_app :: module}}
           | {:error, {:no_configuration_for_prefix, prefix}}
-  def fetch_from_current_env(otp_app, prefix, opts \\ [])
+  def fetch_from_current_env(otp_app, prefix \\ "default", opts \\ [])
       when is_atom(otp_app) and is_binary(prefix) do
-    fetch_from_env(otp_app, unquote(current_environment), prefix, opts)
+    fetch_from_env(otp_app, unquote(env), prefix, opts)
   end
 
-  @doc """
-  Fetch config from the application configuration (e.g. in
-  `confix.exs`).
-
-  `otp_app` is the current OTP application name. `env` is `Mix.env()`
-  value as a binary (string). `prefix` must be one of the configured
-  prefixes.
-  """
+  @doc false
   @spec fetch_from_env(atom, String.t(), prefix, [config_option]) ::
           {:ok, t}
           | {:error, {:no_configuration_for_app, otp_app :: module}}
@@ -157,13 +153,10 @@ defmodule SecretVault.Config do
       when is_atom(otp_app) and is_binary(env) and is_binary(prefix) do
     with {:ok, prefixes} <- fetch_application_env(otp_app),
          {:ok, env_opts} <- find_prefix(prefixes, prefix) do
-      priv_dir = File.cwd!()
-
       opts =
         env_opts
         |> Keyword.merge(opts)
         |> Keyword.put(:prefix, prefix)
-        |> Keyword.put_new(:priv_dir, priv_dir)
 
       config = new(otp_app, opts)
       {:ok, %__MODULE__{config | env: env}}

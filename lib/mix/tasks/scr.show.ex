@@ -23,6 +23,7 @@ defmodule Mix.Tasks.Scr.Show do
   """
 
   @shortdoc "Show an existing secret or list all the ones"
+  @requirements ["app.config"]
 
   use Mix.Task
 
@@ -55,8 +56,12 @@ defmodule Mix.Tasks.Scr.Show do
         message = "Secret #{name} not found in environment #{env}"
         Mix.shell().error(message)
 
-      {:error, :unknown_environment} ->
-        Mix.shell().error("Environment #{env} does not exist")
+      {:error, :unknown_prefix} ->
+        message =
+          "Prefix #{inspect(prefix)} for environment #{inspect(env)}" <>
+            " does not exist"
+
+        Mix.shell().error(message)
 
       {:error, :invalid_encryption_key} ->
         message =

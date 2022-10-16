@@ -39,8 +39,11 @@ defmodule SecretVault do
       iex> config = SecretVault.Config.test_config
       iex> SecretVault.put(config, "db_password", "super_secret_password")
       iex> SecretVault.put(config, "admin_password", "another_password")
-      iex> SecretVault.list(config)
-      ["db_password", "admin_password"]
+      iex> {:ok, names} = SecretVault.list(config)
+      iex> "db_password" in names
+      true
+      iex> "admin_password" in names
+      true
   """
   @spec list(Config.t()) :: {:ok, [String.t()]} | {:error, :unknown_prefix}
   def list(%Config{} = config) do
@@ -92,6 +95,29 @@ defmodule SecretVault do
   end
 
   @doc """
+  Get a clear text value of the secret `name` using the `config`. Reads
+  a data from disk storage, decrypts it, and returns the default if secret was not found.
+
+  Example:
+      iex> config = SecretVault.Config.test_config
+      iex> SecretVault.put(config, "db_password", "super_secret_password")
+      iex> SecretVault.get(config, "db_password")
+      "super_secret_password"
+      iex> SecretVault.get(config, "non_present_password")
+      ""
+  """
+  @spec get(Config.t(), name(), default :: value()) :: value()
+  def get(%Config{} = config, name, default \\ "") do
+    case fetch(config, name) do
+      {:ok, data} ->
+        data
+
+      {:error, _reason} ->
+        default
+    end
+  end
+
+  @doc """
   Fetch a clear text value of the secret `name` using the `config`. Reads
   a data from disk storage, decrypts it, and returns the result of an operation
   in an "either" manner.
@@ -138,8 +164,8 @@ defmodule SecretVault do
         data
 
       # TODO
-      {:error, _reason} ->
-        raise "NO!"
+      {:error, reason} ->
+        raise Error, message: "Couldn't fetch the secret", reason: reason
     end
   end
 
@@ -151,7 +177,7 @@ defmodule SecretVault do
       iex> config = SecretVault.Config.test_config
       iex> SecretVault.put(config, "db_password", "super_secret_password")
       iex> SecretVault.put(config, "admin_password", "another_password")
-      iex> SecretVault.fetch_all(config, "db_password")
+      iex> SecretVault.fetch_all(config)
       {:ok, %{"db_password" => "super_secret_password", "admin_password" => "another_password"}}
   """
   @spec fetch_all(Config.t()) ::

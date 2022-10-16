@@ -55,9 +55,8 @@ defmodule SecretVault.MixProject do
       # extra_section: "GUIDES",
       extra_section: "GUIDES",
       extras: ["README.md" | Path.wildcard("guides/*/*")] ++ ["CHANGELOG.md"],
-
       groups_for_modules: groups_for_modules(),
-      groups_for_extras: groups_for_extras(),
+      groups_for_extras: groups_for_extras()
     ]
   end
 
@@ -100,23 +99,23 @@ defmodule SecretVault.MixProject do
       Runtime: [
         SecretVault,
         SecretVault.Config,
-        SecretVault.Storage,
+        SecretVault.Storage
       ],
       Development: [
         Mix.Tasks.Scr.Create,
         Mix.Tasks.Scr.Edit,
         Mix.Tasks.Scr.Show,
-        Mix.Tasks.Scr.Insert,
+        Mix.Tasks.Scr.Insert
       ],
       Ciphers: [
         SecretVault.Cipher,
         SecretVault.Cipher.ErlangCrypto,
-        SecretVault.Cipher.Plaintext,
+        SecretVault.Cipher.Plaintext
       ],
       "Key Derivations": [
         SecretVault.KeyDerivation,
-        SecretVault.KDFs.PBKDF2,
-      ],
+        SecretVault.KDFs.PBKDF2
+      ]
     ]
   end
 end

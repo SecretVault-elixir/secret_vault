@@ -12,6 +12,7 @@ defmodule Mix.Tasks.Scr.Edit do
   """
 
   @shortdoc "Create a new secret"
+  @requirements ["app.config"]
 
   use Mix.Task
 

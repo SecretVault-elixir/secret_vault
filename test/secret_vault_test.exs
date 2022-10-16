@@ -1,5 +1,6 @@
 defmodule SecretVaultTest do
   use ExUnit.Case, async: true
+  doctest SecretVault, import: true
 
   alias SecretVault.Config
 

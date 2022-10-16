@@ -18,6 +18,8 @@ end
 
 Configuration is straightforward. Minimal configuration would look like this:
 ```
+import Config
+
 config :my_app, :secret_vault,
   default: [password: System.fetch_env!("SECRET_VAULT_PASSWORD")]
 ```
@@ -74,9 +76,27 @@ defmodule MyApp.Application do
 
   def start(_type, _args) do
     ...
-    SecretVault.Config.from
-
+    {:ok, config} = SecretVault.Config.fetch_from_env(:my_app)
+    SecretVault.Storage.to_persistent_term(config)
   end
+end
+```
+
+This will create config from configuration of your application and put all decrypted passwords in the `persistent_term`.
+See `SecretVault.Config` and `SecretVault.Storage` for more options.
+
+If you want to have you options in application env you can specify this in `config.exs`
+
+```
+import Config
+
+config :my_app, :secret_vault,
+  default: [password: System.fetch_env!("SECRET_VAULT_PASSWORD")]
+
+{:ok, config} = SecretVault.Config.fetch_from_env(:my_app)
+SecretVault.Storage.to_application_env(config)
 ```
 
 ### Release
+
+There is no special behaviour for releases. Just `mix release` and use.
