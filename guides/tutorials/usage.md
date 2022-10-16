@@ -1,11 +1,12 @@
 # Usage tutorial
 
-This is a 5 minutes tutorial about usage of `SecretVault` which shows how to install, configure `SecretVault` and create,
-delete, edit and access secrets in `Runtime`.
+This is a 5 minutes `SecretVault` tutorial that shows how to install and
+configure `SecretVault`, and then create, delete, edit, and access secrets
+in runtime.
 
 ### Install
 
-Just add it into your deps like
+Just add it into your dependenciess like
 ```elixir
 defp deps do
   [
@@ -46,7 +47,7 @@ Or, to write a password in your favourite editor, use
 $ mix scr.create dev database_password
 ```
 
-Here `dev` defines the `MIX_ENV` for which you'd like to create a secret. And `database_password` is a name of secret.
+Here `dev` defines the `MIX_ENV` for which you'd like to create a secret. And `database_password` is a name of the secret.
 These exact commands will create a secret in `priv/dev/default/database_password.vault_secret`. Each secret is written onto it's own
 file in vault directory in `priv`. This plays nice with version control systems and simplifies the user interface.
 
@@ -59,9 +60,15 @@ To edit already created secrets, one can use `mix scr.insert` and `mix scr.edit`
 can use regular coreutils like `mv`, `cp`, `rm`, since each secret is placed under the corresponding directory in `priv`. Usually
 the path is `priv/$MIX_ENV/$PREFIX/${SECRET_NAME}.vault_secret`.
 
-For example, to delete secret create in previous step, one could write
+For example, to delete secret which was created in previous step, one could write:
 ```sh
 $ rm priv/dev/default/database_password.vault_secret
+```
+
+Or to rename a secret:
+```sh
+$ cd priv/dev/default/
+$ mv database_password.vault_secret db_password.vault_secret
 ```
 
 ### Access secrets
@@ -93,7 +100,7 @@ import Config
 config :my_app, :secret_vault,
   default: [password: System.fetch_env!("SECRET_VAULT_PASSWORD")]
 
-{:ok, config} = SecretVault.Config.fetch_from_env(:my_app)
+{:ok, config} = SecretVault.Config.fetch_from_current_env(:my_app)
 SecretVault.Storage.to_application_env(config)
 ```
 
