@@ -2,38 +2,6 @@ defmodule SecretVault.TaskHelper do
   @moduledoc false
   # This module is a set of helpers for tasks
 
-  alias SecretVault.Config
-
-  @spec fetch_config(atom(), String.t(), Config.prefix()) ::
-          {:ok, Config.t()}
-          | :error
-          | {:error, {:no_configuration_for_prefix, Config.prefix()}}
-  def fetch_config(otp_app, env, prefix) do
-    with {:ok, prefixes} <- Application.fetch_env(otp_app, :secret_vault),
-         {:ok, opts} <- find_prefix(prefixes, prefix) do
-      priv_dir = File.cwd!()
-
-      opts =
-        opts
-        |> Keyword.put(:prefix, prefix)
-        |> Keyword.put(:priv_dir, priv_dir)
-
-      config = Config.new(otp_app, opts)
-      {:ok, %Config{config | env: env}}
-    end
-  end
-
-  defp find_prefix([], prefix) do
-    {:error, {:no_configuration_for_prefix, prefix}}
-  end
-
-  defp find_prefix([{atom_prefix, opts} | rest], prefix) do
-    case to_string(atom_prefix) do
-      ^prefix -> {:ok, opts}
-      _ -> find_prefix(rest, prefix)
-    end
-  end
-
   @spec find_option([String.t()], String.t(), String.t()) :: String.t() | nil
   def find_option(args, short, option)
 

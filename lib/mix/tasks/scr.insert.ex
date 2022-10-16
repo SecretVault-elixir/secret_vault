@@ -15,16 +15,16 @@ defmodule Mix.Tasks.Scr.Insert do
 
   use Mix.Task
 
-  import SecretVault.TaskHelper
+  alias SecretVault.{Config, TaskHelper}
 
   @impl true
   def run(args)
 
   def run([env, name, data | rest]) do
     otp_app = Mix.Project.config()[:app]
-    prefix = find_option(rest, "p", "prefix") || "default"
+    prefix = TaskHelper.find_option(rest, "p", "prefix") || "default"
 
-    case fetch_config(otp_app, env, prefix) do
+    case Config.fetch_from_env(otp_app, env, prefix) do
       {:ok, config} ->
         SecretVault.put(config, name, data)
 

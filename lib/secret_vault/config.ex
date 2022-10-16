@@ -119,11 +119,35 @@ defmodule SecretVault.Config do
     struct(__MODULE__, [{:key, key} | opts])
   end
 
-  # TODO
-  # def from_env(app_name, opts \\ []) do
-  #   key = Keyword.get(opts, :key, :secret_vault)
-  #   env = Application.fetch_env!(app_name,
-  # end
+  @spec fetch_from_env(atom(), String.t(), Config.prefix()) ::
+          {:ok, Config.t()}
+          | :error
+          | {:error, {:no_configuration_for_prefix, Config.prefix()}}
+  def fetch_from_env(otp_app, env, prefix) do
+    with {:ok, prefixes} <- Application.fetch_env(otp_app, :secret_vault),
+         {:ok, opts} <- find_prefix(prefixes, prefix) do
+      priv_dir = File.cwd!()
+
+      opts =
+        opts
+        |> Keyword.put(:prefix, prefix)
+        |> Keyword.put(:priv_dir, priv_dir)
+
+      config = new(otp_app, opts)
+      {:ok, %__MODULE__{config | env: env}}
+    end
+  end
+
+  defp find_prefix([], prefix) do
+    {:error, {:no_configuration_for_prefix, prefix}}
+  end
+
+  defp find_prefix([{atom_prefix, opts} | rest], prefix) do
+    case to_string(atom_prefix) do
+      ^prefix -> {:ok, opts}
+      _ -> find_prefix(rest, prefix)
+    end
+  end
 
   # This function is required primarily for doctests
   if Code.ensure_loaded?(Mix) && function_exported?(Mix, :env, 0) &&

@@ -15,7 +15,7 @@ defmodule Mix.Tasks.Scr.Edit do
 
   use Mix.Task
 
-  alias SecretVault.{EditorHelper, TaskHelper}
+  alias SecretVault.{Config, EditorHelper, TaskHelper}
 
   @impl true
   def run(args)
@@ -24,7 +24,7 @@ defmodule Mix.Tasks.Scr.Edit do
     otp_app = Mix.Project.config()[:app]
     prefix = TaskHelper.find_option(rest, "p", "prefix") || "default"
 
-    with {:ok, config} <- TaskHelper.fetch_config(otp_app, environment, prefix),
+    with {:ok, config} <- Config.fetch_from_env(otp_app, environment, prefix),
          {:ok, original_data} <- SecretVault.fetch(config, name),
          {:ok, updated_data} <- EditorHelper.open_file_on_edit(original_data) do
       SecretVault.put(config, name, updated_data)
