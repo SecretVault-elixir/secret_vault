@@ -1,4 +1,4 @@
-# SecretVault
+# SecretVault 🔒
 
 All-in-one solution for storing your Elixir application secrets inside the repository.
 
@@ -15,7 +15,7 @@ All-in-one solution for storing your Elixir application secrets inside the repos
 
 ## Usage
 
-Check out our tutorials for usage and extensions API here: https://hexdocs.pm/secret_vault
+Check out our tutorials for usage and extensions API here: https://github.com/spawnfest/secret_vault/blob/main/guides/tutorials/usage.md
 
 ## Installation
 

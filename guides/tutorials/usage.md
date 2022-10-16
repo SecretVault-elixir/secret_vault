@@ -6,7 +6,7 @@ delete, edit and access secrets in `Runtime`.
 ### Install
 
 Just add it into your deps like
-```
+```elixir
 defp deps do
   [
     {:secret_vault, github: "spawnfest/secret_vault"}
@@ -17,7 +17,7 @@ end
 ### Configure
 
 Configuration is straightforward. Minimal configuration would look like this:
-```
+```elixir
 import Config
 
 config :my_app, :secret_vault,
@@ -38,7 +38,7 @@ But do not forget to provide the enviroment variable with the password which we 
 For example,
 ```sh
 $ export SECRET_VAULT_PASSWORD="password" # Don't forget to change the password value
-$ echo "My Super Secret Password" | mix scr.insert dev database_password
+$ mix scr.insert dev database_password "My Super Secret Password"
 ```
 
 Or, to write a password in your favourite editor, use
@@ -70,7 +70,7 @@ To access and use secrets from `Elixir` application, one first need to retrieve 
 to place the secrets into some runtime storage (like `persistent_term`, for example).
 
 So, regular workflow would look like
-```
+```elixir
 defmodule MyApp.Application do
   use Application
 
@@ -87,7 +87,7 @@ See `SecretVault.Config` and `SecretVault.Storage` for more options.
 
 If you want to have you options in application env you can specify this in `config.exs`
 
-```
+```elixir
 import Config
 
 config :my_app, :secret_vault,
@@ -100,4 +100,4 @@ SecretVault.Storage.to_application_env(config)
 ### Release
 
 There is no special behaviour for releases. Just `mix release` and use.
-Do not forget to add `mix scr.audit` task in your `CI` to enforce quality of passwords.
+Don't forget to add `mix scr.audit` task in your `CI` to enforce quality of passwords.
