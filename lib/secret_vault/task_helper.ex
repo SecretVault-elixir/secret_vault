@@ -13,10 +13,8 @@ defmodule SecretVault.TaskHelper do
   end
 
   def fetch_config(otp_app, env, prefix) do
-    with(
-      {:ok, prefixes} <- Application.fetch_env(otp_app, :secret_vault),
-      {:ok, opts} <- find_prefix(prefixes, prefix)
-    ) do
+    with {:ok, prefixes} <- Application.fetch_env(otp_app, :secret_vault),
+         {:ok, opts} <- find_prefix(prefixes, prefix) do
       priv_dir = File.cwd!()
 
       opts =
