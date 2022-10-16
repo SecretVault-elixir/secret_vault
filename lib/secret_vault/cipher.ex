@@ -1,6 +1,9 @@
 defmodule SecretVault.Cipher do
   @moduledoc """
   Provides an interface to implement encryption methods.
+
+  See `SecretVault.Cipher.ErlangCrypto` implementation for more
+  details.
   """
 
   @typedoc """
@@ -36,12 +39,25 @@ defmodule SecretVault.Cipher do
             when opts: Keyword.t()
 
   defmodule Error do
-    @moduledoc "This exception gets raised when some error occurs during decoding"
+    @moduledoc """
+    This exception gets raised when some error occurs during decoding.
+    """
     defexception [:message]
   end
 
   @doc """
-  Use this function to write secret to the file
+  Serialize encryption metadata end a ciphertext into a single binary.
+
+  This is a helper function to prepare the data to be written on the
+  disk.
+
+  ## Example
+
+      iex> cipher = "MyNewCipher"
+      ...> algorithm = "default"
+      ...> ciphertext = "testtest"
+      ...> SecretVault.Cipher.pack(cipher, algorithm, [ciphertext])
+      "MyNewCipher;default;7465737474657374"
   """
   @spec pack(cipher, algorithm, [property]) :: binary
         when cipher: String.t(), algorithm: String.t(), property: binary
@@ -51,6 +67,16 @@ defmodule SecretVault.Cipher do
     Enum.join([cipher, algorithm | encoded_properties], ";")
   end
 
+  @doc """
+  Deserialize `pack/3`'ed data.
+
+  ## Example
+
+      iex> cipher = "MyNewCipher"
+      iex> serialized = "MyNewCipher;default;7465737474657374"
+      iex> SecretVault.Cipher.unpack!(cipher, serialized)
+      ["default", "testtest"]
+  """
   @spec unpack!(cipher, binary) :: [property]
         when cipher: String.t(), property: binary
   def unpack!(cipher, binary)
