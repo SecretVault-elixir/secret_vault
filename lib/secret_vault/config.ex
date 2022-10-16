@@ -73,23 +73,27 @@ defmodule SecretVault.Config do
       ""
     end
 
+  @typedoc """
+  Options to set for a config.
+  """
+  @type config_option ::
+          {:cipher, cipher}
+          | {:cipher_opts, cipher_opts}
+          | {:key_derivation, key_derivation}
+          | {:key_derivation_opts, key_derivation_opts}
+          | {:priv_path, priv_path}
+          | {:prefix, prefix}
+          | {:password, password()}
+          | {:key, key()}
+          | {:env, String.t()}
+
   @doc """
   Creates a struct that keeps configuration data for the storage.
 
   `app_name` is an OTP application name for the app you want to
   keep secrets for.
   """
-  @spec new(app_name :: atom, [option]) :: t
-        when option:
-               {:cipher, cipher}
-               | {:cipher_opts, cipher_opts}
-               | {:key_derivation, key_derivation}
-               | {:key_derivation_opts, key_derivation_opts}
-               | {:priv_path, priv_path}
-               | {:prefix, prefix}
-               | {:password, password()}
-               | {:key, key()}
-               | {:env, String.t()}
+  @spec new(app_name :: atom, [config_option]) :: t
   def new(app_name, opts \\ []) when is_atom(app_name) and is_list(opts) do
     key =
       cond do
@@ -124,13 +128,13 @@ defmodule SecretVault.Config do
   @doc """
   Same as `fetch_from_env/3`, but passes `env` authomatically.
   """
-  @spec fetch_from_current_env(atom(), prefix()) ::
-          {:ok, t()}
+  @spec fetch_from_current_env(atom, prefix, [config_option]) ::
+          {:ok, t}
           | {:error, {:no_configuration_for_app, otp_app :: module}}
-          | {:error, {:no_configuration_for_prefix, prefix()}}
-  def fetch_from_current_env(otp_app, prefix)
+          | {:error, {:no_configuration_for_prefix, prefix}}
+  def fetch_from_current_env(otp_app, prefix, opts \\ [])
       when is_atom(otp_app) and is_binary(prefix) do
-    fetch_from_env(otp_app, unquote(current_environment), prefix)
+    fetch_from_env(otp_app, unquote(current_environment), prefix, opts)
   end
 
   @doc """
@@ -141,20 +145,21 @@ defmodule SecretVault.Config do
   value as a binary (string). `prefix` must be one of the configured
   prefixes.
   """
-  @spec fetch_from_env(atom(), String.t(), prefix()) ::
-          {:ok, t()}
+  @spec fetch_from_env(atom, String.t(), prefix, [config_option]) ::
+          {:ok, t}
           | {:error, {:no_configuration_for_app, otp_app :: module}}
-          | {:error, {:no_configuration_for_prefix, prefix()}}
-  def fetch_from_env(otp_app, env, prefix)
+          | {:error, {:no_configuration_for_prefix, prefix}}
+  def fetch_from_env(otp_app, env, prefix, opts \\ [])
       when is_atom(otp_app) and is_binary(env) and is_binary(prefix) do
     with {:ok, prefixes} <- fetch_application_env(otp_app),
-         {:ok, opts} <- find_prefix(prefixes, prefix) do
+         {:ok, env_opts} <- find_prefix(prefixes, prefix) do
       priv_dir = File.cwd!()
 
       opts =
-        opts
+        env_opts
+        |> Keyword.merge(opts)
         |> Keyword.put(:prefix, prefix)
-        |> Keyword.put(:priv_dir, priv_dir)
+        |> Keyword.put_new(:priv_dir, priv_dir)
 
       config = new(otp_app, opts)
       {:ok, %__MODULE__{config | env: env}}
