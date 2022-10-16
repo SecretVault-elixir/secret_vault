@@ -43,20 +43,22 @@ defmodule SecretVault.Cipher do
   @doc """
   Use this function to write secret to the file
   """
-  @spec pack(cipher :: String.t(), [property :: String.t()]) :: binary()
-  def pack(cipher, properties) when is_binary(cipher) and is_list(properties) do
-    properties
-    |> Enum.map(&Base.encode16/1)
-    |> List.insert_at(0, cipher)
-    |> Enum.join(";")
+  @spec pack(cipher, algorithm, [property]) :: binary
+        when cipher: String.t(), algorithm: String.t(), property: binary
+  def pack(cipher, algorithm, properties)
+      when is_binary(cipher) and is_binary(algorithm) and is_list(properties) do
+    encoded_properties = Enum.map(properties, &Base.encode16/1)
+    Enum.join([cipher, algorithm | encoded_properties], ";")
   end
 
-  @spec unpack!(cipher :: String.t(), binary()) :: [property :: String.t()]
-  def unpack!(cipher, binary) when is_binary(binary) do
+  @spec unpack!(cipher, binary) :: [property]
+        when cipher: String.t(), property: binary
+  def unpack!(cipher, binary)
+      when is_binary(cipher) and is_binary(binary) do
     case String.split(binary, ";") do
-      [^cipher | properties] ->
+      [^cipher, algorithm | properties] ->
         properties = Enum.map(properties, &Base.decode16!/1)
-        properties
+        [algorithm | properties]
 
       [other_cipher | _] ->
         raise Error, "Wrong cipher!. Expected #{cipher}, got: #{other_cipher}"

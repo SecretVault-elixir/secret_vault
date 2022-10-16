@@ -16,8 +16,9 @@ defmodule SecretVault.Cipher.ErlangCrypto do
 
   @behaviour Cipher
 
-  @default_cipher :aes_256_gcm
-  @default_cipher_name "ErlangCrypto"
+  @default_algorithm :aes_256_gcm
+  @cipher_name "ErlangCrypto"
+  @default_algorithm_name "AES256GCM"
 
   @impl true
   def encrypt(key, plain_text, _opts) do
@@ -26,7 +27,7 @@ defmodule SecretVault.Cipher.ErlangCrypto do
 
     {encrypted_plain_text, meta} =
       crypto_one_time_aead(
-        @default_cipher,
+        @default_algorithm,
         key,
         iv,
         plain_text,
@@ -34,16 +35,21 @@ defmodule SecretVault.Cipher.ErlangCrypto do
         true
       )
 
-    Cipher.pack(@default_cipher_name, [iv, aad, meta, encrypted_plain_text])
+    Cipher.pack(@cipher_name, @default_algorithm_name, [
+      iv,
+      aad,
+      meta,
+      encrypted_plain_text
+    ])
   end
 
   @impl true
   def decrypt(key, cipher_text, _opts) do
-    case Cipher.unpack!(@default_cipher_name, cipher_text) do
-      [iv, aad, meta, encrypted_plain_text] ->
+    case Cipher.unpack!(@cipher_name, cipher_text) do
+      [@default_algorithm_name, iv, aad, meta, encrypted_plain_text] ->
         decrypt_result =
           crypto_one_time_aead(
-            @default_cipher,
+            @default_algorithm,
             key,
             iv,
             encrypted_plain_text,
@@ -59,7 +65,7 @@ defmodule SecretVault.Cipher.ErlangCrypto do
 
       list ->
         raise Cipher.Error,
-              "Wrong amount of properties. Expected five props: iv, aad, meta, encrypted_plain_text. Got #{length(list)}"
+              "Wrong amount of properties. Expected five props: algo, iv, aad, meta, encrypted_plain_text. Got #{length(list)}"
     end
   end
 end
