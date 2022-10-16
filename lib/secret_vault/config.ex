@@ -155,13 +155,10 @@ defmodule SecretVault.Config do
       when is_atom(otp_app) and is_binary(env) and is_binary(prefix) do
     with {:ok, prefixes} <- fetch_application_env(otp_app),
          {:ok, env_opts} <- find_prefix(prefixes, prefix) do
-      priv_dir = File.cwd!()
-
       opts =
         env_opts
         |> Keyword.merge(opts)
         |> Keyword.put(:prefix, prefix)
-        |> Keyword.put_new(:priv_dir, priv_dir)
 
       config = new(otp_app, opts)
       {:ok, %__MODULE__{config | env: env}}

@@ -27,3 +27,6 @@ secret_vault-*.tar
 
 # We don't need any persistant configuration here.
 /config/
+
+# We don't want to track values created in dev environment.
+/priv/secret_vault/

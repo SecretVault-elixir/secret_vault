@@ -34,4 +34,10 @@ defmodule SecretVault.CLI do
   def find_option([], _, _) do
     nil
   end
+
+  priv_path = "#{File.cwd!()}/priv"
+
+  def priv_path do
+    unquote(priv_path)
+  end
 end
