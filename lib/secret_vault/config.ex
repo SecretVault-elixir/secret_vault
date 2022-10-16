@@ -150,7 +150,7 @@ defmodule SecretVault.Config do
   end
 
   # This function is required primarily for doctests
-  if Code.ensure_loaded?(Mix) && function_exported?(Mix, :env, 0) &&
+  if Code.ensure_loaded?(Mix) and function_exported?(Mix, :env, 0) and
        Mix.env() == :test do
     def test_config do
       new(:secret_vault,
