@@ -29,7 +29,7 @@ defmodule SecretVault do
   """
   @spec list(Config.t()) :: {:ok, [String.t()]} | {:error, :unknown_prefix}
   def list(%Config{} = config) do
-    case File.ls(resolve_path(config)) do
+    case File.ls(resolve_environment_path(config)) do
       {:ok, files} ->
         files =
           Enum.map(files, fn filename ->
@@ -60,8 +60,8 @@ defmodule SecretVault do
         config.cipher_opts
       )
 
-    path = resolve_path(config)
-    file_path = resolve_path(config, name)
+    path = resolve_environment_path(config)
+    file_path = resolve_secret_path(config, name)
 
     with :ok <- File.mkdir_p(path) do
       File.write(file_path, encrypted_data)
@@ -104,28 +104,27 @@ defmodule SecretVault do
     at_path(config, name, &File.rm/1)
   end
 
-  @doc """
-  Resolves a path to the `name` secret
-  """
-  @spec resolve_path(Config.t(), name()) :: Path.t()
-  def resolve_path(%Config{} = config, name) when is_binary(name) do
+  # Resolves a path to the `name` secret
+  @doc false
+  @spec resolve_secret_path(Config.t(), name()) :: Path.t()
+  def resolve_secret_path(%Config{} = config, name) when is_binary(name) do
     file_name = name <> unquote(extension)
-    Path.join([resolve_path(config), file_name])
+    Path.join([resolve_environment_path(config), file_name])
   end
 
-  @doc """
-  Resolves a path to the prefixed directory with secrets
-  """
-  @spec resolve_path(Config.t()) :: Path.t()
-  def resolve_path(%Config{priv_path: priv_path, env: env, prefix: prefix}) do
+  # Resolves a path to the prefixed directory with secrets
+  @doc false
+  @spec resolve_environment_path(Config.t()) :: Path.t()
+  def resolve_environment_path(config) do
+    %Config{priv_path: priv_path, env: env, prefix: prefix} = config
     Path.join([priv_path, "secret_vault", env, prefix])
   end
 
   # Helpers
 
   defp at_path(config, name, closure) do
-    path = resolve_path(config)
-    file_path = resolve_path(config, name)
+    path = resolve_environment_path(config)
+    file_path = resolve_secret_path(config, name)
 
     cond do
       File.exists?(file_path) -> closure.(file_path)
