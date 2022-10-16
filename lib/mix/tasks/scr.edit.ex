@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Scr.Edit do
   @moduledoc """
   Creates a new secret in specified environment and under specified
-  name.
+  name using your preffered editor.
 
   It uses configuration of current application to retrieve keys and
   so on.

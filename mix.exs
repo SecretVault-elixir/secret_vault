@@ -53,10 +53,11 @@ defmodule SecretVault.MixProject do
 
       # TODO
       # extra_section: "GUIDES",
-      extras: ["README.md", "CHANGELOG.md"]
+      extra_section: "GUIDES",
+      extras: ["README.md" | Path.wildcard("guides/*/*")] ++ ["CHANGELOG.md"],
 
-      # groups_for_modules: groups_for_modules(),
-      # groups_for_extras: groups_for_extras()
+      groups_for_modules: groups_for_modules(),
+      groups_for_extras: groups_for_extras(),
     ]
   end
 
@@ -86,5 +87,36 @@ defmodule SecretVault.MixProject do
 
   defp dialyzer do
     [plt_add_apps: [:mix]]
+  end
+
+  defp groups_for_extras do
+    [
+      Tutorials: ~r/guides\/tutorials\/.*/
+    ]
+  end
+
+  defp groups_for_modules do
+    [
+      Runtime: [
+        SecretVault,
+        SecretVault.Config,
+        SecretVault.Storage,
+      ],
+      Development: [
+        Mix.Tasks.Scr.Create,
+        Mix.Tasks.Scr.Edit,
+        Mix.Tasks.Scr.Show,
+        Mix.Tasks.Scr.Insert,
+      ],
+      Ciphers: [
+        SecretVault.Cipher,
+        SecretVault.Cipher.ErlangCrypto,
+        SecretVault.Cipher.Plaintext,
+      ],
+      "Key Derivations": [
+        SecretVault.KeyDerivation,
+        SecretVault.KDFs.PBKDF2,
+      ],
+    ]
   end
 end

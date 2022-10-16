@@ -54,6 +54,8 @@ defmodule SecretVault.Config do
   """
   @type password :: String.t()
 
+  @typedoc """
+  """
   @type t :: %__MODULE__{
           cipher_opts: cipher_opts(),
           cipher: cipher(),

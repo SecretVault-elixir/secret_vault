@@ -55,11 +55,12 @@ defmodule SecretVault.Storage do
   def to_application_env(
         config,
         application_name,
+        env_key \\ :secret_storage,
         transform \\ &default_transform/2
       ) do
     with {:ok, map} <- SecretVault.fetch_all(config) do
       map = Map.new(map, fn {key, value} -> transform.(key, value) end)
-      Application.put_env(application_name, :secret_storage, map)
+      Application.put_env(application_name, env_key, map)
     end
   end
 

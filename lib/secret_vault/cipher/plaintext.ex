@@ -1,7 +1,9 @@
 defmodule SecretVault.Cipher.Plaintext do
   @moduledoc """
-  Stores passwords in plaintext. Do not use this anywhere except the development.
-  And please, if you're using this, make sure that the passwords are unique.
+  Stores passwords in plaintext.
+
+  **WARNING!!!** This cipher is insecure and supposed to be used only in testing
+  or self encrypting filesystems.
   """
 
   alias SecretVault.Cipher

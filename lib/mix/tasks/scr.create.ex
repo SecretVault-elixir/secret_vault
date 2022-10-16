@@ -1,10 +1,10 @@
 defmodule Mix.Tasks.Scr.Create do
   @moduledoc """
   Creates a new secret in specified environment and under specified
-  name.
+  name using your preffered editor.
 
   It uses configuration of current application to retrieve keys and
-  so on.
+  other options.
 
   ## Usage
       mix scr.create prod database_url

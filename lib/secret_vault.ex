@@ -1,9 +1,16 @@
 defmodule SecretVault do
   @moduledoc """
-  Provides a way to access existing stored secrets.
+  Runtime interface to manipulate on-disk secrets
   """
 
   alias SecretVault.Config
+
+  defmodule Error do
+    @moduledoc """
+    Exception for bang functions in `SecretVault`
+    """
+    defexception [:message, :reason]
+  end
 
   @typedoc """
   - `:unknown_prefix` means that directory with secrets is not present on disk
@@ -25,7 +32,15 @@ defmodule SecretVault do
   extension = ".vault_secret"
 
   @doc """
-  Show secrets' names available.
+  Show all secrets' names available. It reads secrets from directory specified by `config`
+  and retruns a list of names with no particular order.
+
+  Example:
+      iex> config = SecretVault.Config.test_config
+      iex> SecretVault.put(config, "db_password", "super_secret_password")
+      iex> SecretVault.put(config, "admin_password", "another_password")
+      iex> SecretVault.list(config)
+      ["db_password", "admin_password"]
   """
   @spec list(Config.t()) :: {:ok, [String.t()]} | {:error, :unknown_prefix}
   def list(%Config{} = config) do
@@ -47,7 +62,16 @@ defmodule SecretVault do
   end
 
   @doc """
-  Put `data` as a value of the secret `name` using the `config`.
+  Put `data` as a value of the secret `name` using the `config`. This function
+  writes encrypted data to the disk, therefore use this with caution. If you
+  want to write data in runtime, it is recommended to create singleton
+  process to perform mutating operations
+
+  Example:
+      iex> config = SecretVault.Config.test_config
+      iex> SecretVault.put(config, "db_password", "super_secret_password")
+      iex> SecretVault.get(config, "db_password")
+      "super_secret_password"
   """
   @spec put(Config.t(), name(), value()) :: :ok | {:error, File.posix()}
   def put(%Config{} = config, name, data)
@@ -68,7 +92,17 @@ defmodule SecretVault do
   end
 
   @doc """
-  Fetch a clear text value of the secret `name` using the `config`.
+  Fetch a clear text value of the secret `name` using the `config`. Reads
+  a data from disk storage, decrypts it, and returns the result of an operation
+  in an "either" manner.
+
+  Example:
+      iex> config = SecretVault.Config.test_config
+      iex> SecretVault.put(config, "db_password", "super_secret_password")
+      iex> SecretVault.fetch(config, "db_password")
+      {:ok, "super_secret_password"}
+      iex> SecretVault.fetch(config, "non_present_password")
+      {:error, :secret_not_found}
   """
   @spec fetch(Config.t(), name()) :: {:ok, value()} | {:error, reason()}
   def fetch(%Config{} = config, name) when is_binary(name) do
@@ -88,7 +122,16 @@ defmodule SecretVault do
 
   @doc """
   Fetch a clear text value of the secret `name` using the `config`.
-  Raises if no secret with the `name` found
+
+  Fetch a clear text value of the secret `name` using the `config`. Reads
+  a data from disk storage, decrypts it, and returns the decrypted data or
+  raises if no secret with the `name` found.
+
+  Example:
+      iex> config = SecretVault.Config.test_config
+      iex> SecretVault.put(config, "db_password", "super_secret_password")
+      iex> SecretVault.fetch!(config, "db_password")
+      "super_secret_password"
   """
   @spec fetch!(Config.t(), name()) :: value()
   def fetch!(%Config{} = config, name) do
@@ -103,7 +146,15 @@ defmodule SecretVault do
   end
 
   @doc """
-  Asynchronously fetches all secrets from the vault
+  Asynchronously fetches all secrets from the vault specified by the `config` from disk.
+  This function returns a map or error in "either" manner.
+
+  Example:
+      iex> config = SecretVault.Config.test_config
+      iex> SecretVault.put(config, "db_password", "super_secret_password")
+      iex> SecretVault.put(config, "admin_password", "another_password")
+      iex> SecretVault.fetch_all(config, "db_password")
+      {:ok, %{"db_password" => "super_secret_password", "admin_password" => "another_password"}}
   """
   @spec fetch_all(Config.t()) ::
           {:ok, %{name() => value()}} | {:error, {name(), reason()}}
@@ -114,7 +165,14 @@ defmodule SecretVault do
   end
 
   @doc """
-  Remove secret `name` from the `environment`.
+  Remove secret `name` from the vault specified by the `config` from disk.
+
+  Example:
+      iex> config = SecretVault.Config.test_config
+      iex> SecretVault.put(config, "db_password", "super_secret_password")
+      iex> SecretVault.delete(config, "db_password")
+      iex> SecretVault.fetch(config, "db_password")
+      {:error, :secret_not_found}
   """
   @spec delete(Config.t(), name()) :: :ok | {:error, reason()}
   def delete(%Config{} = config, name) when is_binary(name) do
@@ -122,7 +180,15 @@ defmodule SecretVault do
   end
 
   @doc """
-  Tell whether the secret `name` exists.
+  Tells whether the secret `name` exists.
+
+  Example:
+      iex> config = SecretVault.Config.test_config
+      iex> SecretVault.put(config, "db_password", "super_secret_password")
+      iex> SecretVault.exists?(config, "db_password")
+      true
+      iex> SecretVault.exists?(config, "non_present_password")
+      false
   """
   @spec exists?(Config.t(), name()) :: boolean()
   def exists?(config, name) do
