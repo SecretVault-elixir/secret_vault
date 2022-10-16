@@ -100,3 +100,4 @@ SecretVault.Storage.to_application_env(config)
 ### Release
 
 There is no special behaviour for releases. Just `mix release` and use.
+Do not forget to add `mix scr.audit` task in your `CI` to enforce quality of passwords.

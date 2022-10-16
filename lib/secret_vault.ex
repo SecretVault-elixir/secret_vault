@@ -183,7 +183,9 @@ defmodule SecretVault do
       {:ok, %{"db_password" => "super_secret_password", "admin_password" => "another_password"}}
   """
   @spec fetch_all(Config.t()) ::
-          {:ok, %{name() => value()}} | {:error, {name(), reason()}}
+          {:ok, %{name() => value()}}
+          | {:error, {name(), reason()}}
+          | {:error, reason()}
   def fetch_all(%Config{} = config) do
     at_all_names(config, {:ok, %{}}, fn name, value, {:ok, acc} ->
       {:cont, {:ok, Map.put(acc, name, value)}}

@@ -5,8 +5,8 @@ All-in-one solution for storing your Elixir application secrets inside the repos
 ## Features
 
 * **Standalone**. No dependencies on external binaries.
-* **Secure**. Uses `aes256gcm` cipher by default. Performs audit to detect weak and duplicate passwords.
-* **Developer friendly**. You can use `mix scr.*` tasks to create or edit secrets in your favourit editor. Or you can use simple coreutils like `mv`, `rm`, `cp`
+* **Secure**. Uses `aes256gcm` cipher by default. Performs audit to detect weak and duplicate passwords using `mix scr.audit` task.
+* **Developer friendly**. You can use `mix scr.*` tasks to create or edit secrets in your favourit editor. Or you can use simple coreutils like `mv`, `rm`, `cp`.
 * **Easy to use**. Documatation is rich, errors are descriptive and tutorials take no more than 5 minutes to read.
 * **VCS friendly**. `SecretVault` stores secrets in separate files, thus makes it easily to track in VCS.
 * **Mix friendly**. `SecretVault` enforces you to separate secrets for different environments.

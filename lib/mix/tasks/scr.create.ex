@@ -13,7 +13,7 @@ defmodule Mix.Tasks.Scr.Create do
 
   You can override config options by providing command line arguments.
 
-  - `:cipher` - specify a cipher to use;
+  - `:cipher` - specify a cipher module to use;
   - `:priv_path` - path to `priv` directory;
   - `:prefix` - prefix to use (defaults to `default`);
   - `:password` - use a password that's different from the one that's
