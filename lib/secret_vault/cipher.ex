@@ -26,8 +26,13 @@ defmodule SecretVault.Cipher do
 
   @doc """
   Decrypt the `cypher_text` with the `key` used to get it.
+
+  If key is invalid, `:invalid_key` error is returned. If
+  inappropriate text is passed as `cypher_text`, `Cipher.Error` is
+  raised.
   """
-  @callback decrypt(key, cypher_text, opts) :: plain_text
+  @callback decrypt(key, cypher_text, opts) ::
+              {:ok, plain_text} | {:error, :invalid_encryption_key}
             when opts: Keyword.t()
 
   defmodule Error do

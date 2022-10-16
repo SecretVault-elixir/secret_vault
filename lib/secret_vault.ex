@@ -104,19 +104,17 @@ defmodule SecretVault do
       iex> SecretVault.fetch(config, "non_present_password")
       {:error, :secret_not_found}
   """
-  @spec fetch(Config.t(), name()) :: {:ok, value()} | {:error, reason()}
+  @spec fetch(Config.t(), name) :: {:ok, value} | {:error, error}
+        when error: reason | :invalid_encryption_key
   def fetch(%Config{} = config, name) when is_binary(name) do
     at_path(config, name, fn file_path ->
       encrypted_data = File.read!(file_path)
 
-      data =
-        config.cipher.decrypt(
-          config.key,
-          encrypted_data,
-          config.cipher_opts
-        )
-
-      {:ok, data}
+      config.cipher.decrypt(
+        config.key,
+        encrypted_data,
+        config.cipher_opts
+      )
     end)
   end
 

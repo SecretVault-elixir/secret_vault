@@ -24,7 +24,13 @@ defmodule Mix.Tasks.Scr.Edit do
     otp_app = Mix.Project.config()[:app]
     prefix = CLI.find_option(rest, "p", "prefix") || "default"
 
-    with {:ok, config} <- Config.fetch_from_env(otp_app, environment, prefix),
+    config_opts =
+      Config.available_options()
+      |> Enum.map(&{&1, CLI.find_option(rest, nil, "#{&1}")})
+      |> Enum.reject(fn {_, value} -> is_nil(value) end)
+
+    with {:ok, config} <-
+           Config.fetch_from_env(otp_app, environment, prefix, config_opts),
          {:ok, original_data} <- SecretVault.fetch(config, name),
          {:ok, updated_data} <- Editor.open_file_on_edit(original_data) do
       SecretVault.put(config, name, updated_data)
@@ -32,6 +38,9 @@ defmodule Mix.Tasks.Scr.Edit do
       {:error, {:no_configuration_for_prefix, prefix}} ->
         message = "No configuration for prefix #{inspect(prefix)} found"
         Mix.shell().error(message)
+
+      {:error, {:no_configuration_for_app, otp_app}} ->
+        Mix.shell().error("No configuration for otp_app #{otp_app} found")
 
       {:error, {:non_zero_exit_code, code}} ->
         Mix.shell().error("Non zero exit code #{code}")
@@ -42,6 +51,13 @@ defmodule Mix.Tasks.Scr.Edit do
       {:error, :secret_not_found} ->
         message =
           "Secret #{name} not found in environment #{inspect(environment)}"
+
+        Mix.shell().error(message)
+
+      {:error, :invalid_encryption_key} ->
+        message =
+          "Invalid key. It seems the secret was encrypted with " <>
+            "a different encryption key"
 
         Mix.shell().error(message)
 
