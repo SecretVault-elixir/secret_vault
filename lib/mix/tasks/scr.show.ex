@@ -42,6 +42,9 @@ defmodule Mix.Tasks.Scr.Show do
       {:error, {:no_configuration_for_prefix, prefix}} ->
         Mix.shell().error("No configuration for prefix #{prefix} found")
 
+      {:error, {:no_configuration_for_app, otp_app}} ->
+        Mix.shell().error("No configuration for otp_app #{otp_app} found")
+
       {:error, :secret_not_found} ->
         message = "Secret #{name} not found in environment #{env}"
         Mix.shell().error(message)

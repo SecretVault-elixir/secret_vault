@@ -33,6 +33,9 @@ defmodule Mix.Tasks.Scr.Edit do
         message = "No configuration for prefix #{inspect(prefix)} found"
         Mix.shell().error(message)
 
+      {:error, {:no_configuration_for_app, otp_app}} ->
+        Mix.shell().error("No configuration for otp_app #{otp_app} found")
+
       {:error, {:non_zero_exit_code, code}} ->
         Mix.shell().error("Non zero exit code #{code}")
 

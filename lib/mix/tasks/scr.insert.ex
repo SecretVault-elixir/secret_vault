@@ -28,8 +28,8 @@ defmodule Mix.Tasks.Scr.Insert do
       {:ok, config} ->
         SecretVault.put(config, name, data)
 
-      :error ->
-        Mix.shell().error("No configuration found")
+      {:error, {:no_configuration_for_app, otp_app}} ->
+        Mix.shell().error("No configuration for otp_app #{otp_app} found")
 
       {:error, {:no_configuration_for_prefix, prefix}} ->
         message = "No configuration for prefix #{inspect(prefix)} found"

@@ -126,7 +126,7 @@ defmodule SecretVault.Config do
   """
   @spec fetch_from_env(atom(), prefix()) ::
           {:ok, t()}
-          | :error
+          | {:error, {:no_configuration_for_app, otp_app :: module}}
           | {:error, {:no_configuration_for_prefix, prefix()}}
   def fetch_from_env(otp_app, prefix)
       when is_atom(otp_app) and is_binary(prefix) do
@@ -143,11 +143,11 @@ defmodule SecretVault.Config do
   """
   @spec fetch_from_env(atom(), String.t(), prefix()) ::
           {:ok, t()}
-          | :error
+          | {:error, {:no_configuration_for_app, otp_app :: module}}
           | {:error, {:no_configuration_for_prefix, prefix()}}
   def fetch_from_env(otp_app, env, prefix)
       when is_atom(otp_app) and is_binary(env) and is_binary(prefix) do
-    with {:ok, prefixes} <- Application.fetch_env(otp_app, :secret_vault),
+    with {:ok, prefixes} <- fetch_application_env(otp_app),
          {:ok, opts} <- find_prefix(prefixes, prefix) do
       priv_dir = File.cwd!()
 
@@ -158,6 +158,12 @@ defmodule SecretVault.Config do
 
       config = new(otp_app, opts)
       {:ok, %__MODULE__{config | env: env}}
+    end
+  end
+
+  defp fetch_application_env(otp_app) do
+    with :error <- Application.fetch_env(otp_app, :secret_vault) do
+      {:error, {:no_configuration_for_app, otp_app}}
     end
   end
 
