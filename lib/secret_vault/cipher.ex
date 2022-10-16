@@ -50,6 +50,14 @@ defmodule SecretVault.Cipher do
 
   This is a helper function to prepare the data to be written on the
   disk.
+
+  ## Example
+
+      iex> cipher = "MyNewCipher"
+      ...> algorithm = "default"
+      ...> ciphertext = "testtest"
+      ...> SecretVault.Cipher.pack(cipher, algorithm, [ciphertext])
+      "MyNewCipher;default;7465737474657374"
   """
   @spec pack(cipher, algorithm, [property]) :: binary
         when cipher: String.t(), algorithm: String.t(), property: binary
@@ -61,6 +69,13 @@ defmodule SecretVault.Cipher do
 
   @doc """
   Deserialize `pack/3`'ed data.
+
+  ## Example
+
+      iex> cipher = "MyNewCipher"
+      iex> serialized = "MyNewCipher;default;7465737474657374"
+      iex> SecretVault.Cipher.unpack!(cipher, serialized)
+      ["default", "testtest"]
   """
   @spec unpack!(cipher, binary) :: [property]
         when cipher: String.t(), property: binary
