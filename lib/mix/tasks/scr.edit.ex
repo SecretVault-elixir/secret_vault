@@ -54,6 +54,13 @@ defmodule Mix.Tasks.Scr.Edit do
 
         Mix.shell().error(message)
 
+      {:error, :invalid_encryption_key} ->
+        message =
+          "Invalid key. It seems the secret was encrypted with " <>
+            "a different encryption key"
+
+        Mix.shell().error(message)
+
       {:error, :unknown_prefix} ->
         message =
           "Prefix #{inspect(prefix)} for environment #{inspect(environment)}" <>

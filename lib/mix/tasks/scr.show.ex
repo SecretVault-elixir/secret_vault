@@ -57,6 +57,13 @@ defmodule Mix.Tasks.Scr.Show do
 
       {:error, :unknown_environment} ->
         Mix.shell().error("Environment #{env} does not exist")
+
+      {:error, :invalid_encryption_key} ->
+        message =
+          "Invalid key. It seems the secret was encrypted with " <>
+            "a different encryption key"
+
+        Mix.shell().error(message)
     end
   end
 

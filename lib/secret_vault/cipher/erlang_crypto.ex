@@ -41,15 +41,21 @@ defmodule SecretVault.Cipher.ErlangCrypto do
   def decrypt(key, cipher_text, _opts) do
     case Cipher.unpack!(@default_cipher_name, cipher_text) do
       [iv, aad, meta, encrypted_plain_text] ->
-        crypto_one_time_aead(
-          @default_cipher,
-          key,
-          iv,
-          encrypted_plain_text,
-          aad,
-          meta,
-          false
-        )
+        decrypt_result =
+          crypto_one_time_aead(
+            @default_cipher,
+            key,
+            iv,
+            encrypted_plain_text,
+            aad,
+            meta,
+            false
+          )
+
+        case decrypt_result do
+          :error -> {:error, :invalid_encryption_key}
+          data when is_binary(data) -> {:ok, data}
+        end
 
       list ->
         raise Cipher.Error,
