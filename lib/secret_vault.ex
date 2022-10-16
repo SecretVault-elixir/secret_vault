@@ -1,13 +1,13 @@
 defmodule SecretVault do
   @moduledoc """
-  Runtime interface to manipulate on-disk secrets
+  Runtime interface to manipulate on-disk secrets.
   """
 
   alias SecretVault.Config
 
   defmodule Error do
     @moduledoc """
-    Exception for bang functions in `SecretVault`
+    Exception for bang functions in `SecretVault`.
     """
     defexception [:message, :reason]
   end
