@@ -1,6 +1,6 @@
 defmodule SecretVault.KeyDerivation do
   @moduledoc """
-  Provides a way to derive a key from a user input.
+  Defines an interface to derive a key from user-defined password.
   """
 
   @doc """
