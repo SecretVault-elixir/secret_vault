@@ -26,14 +26,14 @@ defmodule Mix.Tasks.Scr.Show do
 
   use Mix.Task
 
-  alias SecretVault.{Config, TaskHelper}
+  alias SecretVault.{Config, CLI}
 
   @impl true
   def run(args)
 
   def run([env, name | rest]) do
     otp_app = Mix.Project.config()[:app]
-    prefix = TaskHelper.find_option(rest, "p", "prefix") || "default"
+    prefix = CLI.find_option(rest, "p", "prefix") || "default"
 
     with {:ok, config} <- Config.fetch_from_env(otp_app, env, prefix),
          {:ok, data} <- SecretVault.fetch(config, name) do
@@ -53,7 +53,7 @@ defmodule Mix.Tasks.Scr.Show do
 
   def run([environment | rest]) do
     otp_app = Mix.Project.config()[:app]
-    prefix = TaskHelper.find_option(rest, "p", "prefix") || "default"
+    prefix = CLI.find_option(rest, "p", "prefix") || "default"
 
     with {:ok, config} <- Config.fetch_from_env(otp_app, environment, prefix),
          {:ok, names} <- SecretVault.list(config) do

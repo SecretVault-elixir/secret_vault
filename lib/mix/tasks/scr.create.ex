@@ -14,14 +14,14 @@ defmodule Mix.Tasks.Scr.Create do
 
   use Mix.Task
 
-  alias SecretVault.{Config, Editor, TaskHelper}
+  alias SecretVault.{Config, Editor, CLI}
 
   @impl true
   def run(args)
 
   def run([environment, name | rest]) do
     otp_app = Mix.Project.config()[:app]
-    prefix = TaskHelper.find_option(rest, "p", "prefix") || "default"
+    prefix = CLI.find_option(rest, "p", "prefix") || "default"
 
     with {:ok, config} <- Config.fetch_from_env(otp_app, environment, prefix),
          :ok <- ensure_secret_doesn_not_exist(config, name),

@@ -1,4 +1,4 @@
-defmodule SecretVault.TaskHelper do
+defmodule SecretVault.CLI do
   @moduledoc false
   # This module is a set of helpers for tasks
 
