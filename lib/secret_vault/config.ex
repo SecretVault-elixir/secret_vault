@@ -3,11 +3,13 @@ defmodule SecretVault.Config do
   Keeps configuration for a `SecretVault.Storage`.
   """
 
-  defstruct [:key, :env] ++ [
-            cipher: SecretVault.Cipher.ErlangCrypto,
-            cipher_opts: [],
-            priv_path: nil,
-            prefix: nil]
+  defstruct [:key, :env] ++
+              [
+                cipher: SecretVault.Cipher.ErlangCrypto,
+                cipher_opts: [],
+                priv_path: nil,
+                prefix: nil
+              ]
 
   @typedoc """
   A module implementing `SecretVault.EncryptionProvider` behaviour.
@@ -66,7 +68,7 @@ defmodule SecretVault.Config do
   # or work without `env` path at all
   env =
     if Code.ensure_loaded?(Mix) && function_exported?(Mix, :env, 0) do
-      to_string Mix.env()
+      to_string(Mix.env())
     else
       ""
     end
@@ -95,7 +97,9 @@ defmodule SecretVault.Config do
           key
 
         password = opts[:password] ->
-          key_derivation      = Keyword.get(opts, :key_derivation, SecretVault.KDFs.PBKDF2)
+          key_derivation =
+            Keyword.get(opts, :key_derivation, SecretVault.KDFs.PBKDF2)
+
           key_derivation_opts = Keyword.get(opts, :key_derivation_opts, [])
 
           key_derivation.kdf(password, key_derivation_opts)
@@ -107,10 +111,10 @@ defmodule SecretVault.Config do
     opts =
       opts
       |> Keyword.put_new_lazy(:priv_path, fn ->
-        to_string :code.priv_dir app_name
+        to_string(:code.priv_dir(app_name))
       end)
       |> Keyword.put_new(:prefix, "secrets")
-      |> Keyword.put_new(:env, to_string unquote env)
+      |> Keyword.put_new(:env, to_string(unquote(env)))
       |> Keyword.put_new(:key, key)
 
     struct(__MODULE__, [{:key, key} | opts])

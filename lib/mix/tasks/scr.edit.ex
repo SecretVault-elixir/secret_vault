@@ -28,12 +28,15 @@ defmodule Mix.Tasks.Scr.Edit do
 
     with(
       {:ok, config} <- fetch_config(otp_app, env, prefix),
-      {:ok, updated_data} <- open_file_on_edit(editor, SecretVault.get(config, name))
+      {:ok, updated_data} <-
+        open_file_on_edit(editor, SecretVault.get(config, name))
     ) do
       SecretVault.put(config, name, updated_data)
     else
       {:error, {:no_configuration_for_prefix, prefix}} ->
-        Mix.shell().error("No configuration for prefix #{inspect prefix} found")
+        Mix.shell().error(
+          "No configuration for prefix #{inspect(prefix)} found"
+        )
 
       {:error, :no_vaults_configured} ->
         Mix.shell().error("No vaults configured for the app")
@@ -52,11 +55,13 @@ defmodule Mix.Tasks.Scr.Edit do
         Mix.shell().error("Editor not found: #{editor}")
 
       {:error, :secret_not_found} ->
-        message = "Secret #{name} not found in environment #{inspect env}"
+        message = "Secret #{name} not found in environment #{inspect(env)}"
         Mix.shell().error(message)
 
       {:error, :unknown_prefix} ->
-        Mix.shell().error("Prefix #{inspect prefix} for environment #{inspect env} does not exist")
+        Mix.shell().error(
+          "Prefix #{inspect(prefix)} for environment #{inspect(env)} does not exist"
+        )
     end
   end
 
@@ -72,7 +77,7 @@ defmodule Mix.Tasks.Scr.Edit do
       System.get_env("EDITOR"),
       "xdg-open"
     ]
-    |> Enum.find(& &1 not in [nil, ""])
+    |> Enum.find(&(&1 not in [nil, ""]))
   end
 
   @spec open_file_on_edit(editor, data) :: {:ok, data} | {:error, error}
@@ -81,7 +86,8 @@ defmodule Mix.Tasks.Scr.Edit do
              error:
                {:non_zero_exit_code, code :: integer, message :: String.t()}
                | {:executable_not_found, editor :: String.t()}
-  def open_file_on_edit(editor, data) when is_binary(editor) and is_binary(data) do
+  def open_file_on_edit(editor, data)
+      when is_binary(editor) and is_binary(data) do
     tmp_path = accuire_tmp_file!()
     File.write!(tmp_path, data)
 
@@ -116,11 +122,12 @@ defmodule Mix.Tasks.Scr.Edit do
   end
 
   defp accuire_tmp_file! do
-    tmp_file_name = (Base.encode16 :crypto.strong_rand_bytes 16) <> ".txt"
+    tmp_file_name = Base.encode16(:crypto.strong_rand_bytes(16)) <> ".txt"
     tmp_path = Path.join(System.tmp_dir!(), tmp_file_name)
-    File.mkdir_p! Path.dirname tmp_path
+    File.mkdir_p!(Path.dirname(tmp_path))
     File.touch!(tmp_path)
-    File.chmod!(tmp_path, 0o600) # Read/write for owner only
+    # Read/write for owner only
+    File.chmod!(tmp_path, 0o600)
     tmp_path
   end
 end

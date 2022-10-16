@@ -15,10 +15,7 @@ defmodule Mix.Tasks.Scr.Create do
 
   use Mix.Task
 
-  alias SecretVault.Config
   import SecretVault.TaskHelper
-
-  @default_editor "nano"
 
   @impl true
   def run(args)
@@ -27,17 +24,12 @@ defmodule Mix.Tasks.Scr.Create do
     otp_app = Mix.Project.config()[:app]
     prefix = find_option(rest, "p", "prefix") || "default"
 
-    with {:ok, config} <- fetch_config(otp_app, env, prefix) do
-      SecretVault.put(config, name, data)
-    else
+    case fetch_config(otp_app, env, prefix) do
+      {:ok, config} ->
+        SecretVault.put(config, name, data)
+
       :error ->
-        Mix.shell().error("Prefix #{inspect prefix} was not found")
-
-      {:error, {:non_zero_exit_code, code, message}} ->
-        Mix.shell().error("Non zero exit code #{code}: #{message}")
-
-      {:error, {:executable_not_found, editor}} ->
-        Mix.shell().error("Editor not found: #{editor}")
+        Mix.shell().error("Prefix #{inspect(prefix)} was not found")
     end
   end
 

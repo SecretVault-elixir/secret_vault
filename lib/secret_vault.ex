@@ -1,5 +1,4 @@
 defmodule SecretVault do
-
   @moduledoc """
   Provides a way to access existing stored secrets.
   """
@@ -30,13 +29,16 @@ defmodule SecretVault do
   """
   @spec list(Config.t()) :: {:ok, [String.t()]} | {:error, :unknown_prefix}
   def list(%Config{} = config) do
-    case File.ls resolve_path config do
+    case File.ls(resolve_path(config)) do
       {:ok, files} ->
         files =
           Enum.map(files, fn filename ->
-            {name, unquote extension} = String.split_at(filename, - unquote byte_size extension)
+            {name, unquote(extension)} =
+              String.split_at(filename, -unquote(byte_size(extension)))
+
             name
           end)
+
         {:ok, files}
 
       {:error, _} ->
@@ -49,7 +51,8 @@ defmodule SecretVault do
   encrypted with the `key` and using the `config`.
   """
   @spec put(Config.t(), name(), value()) :: :ok | {:error, File.posix()}
-  def put(%Config{} = config, name, data) when is_binary(name) and is_binary(data) do
+  def put(%Config{} = config, name, data)
+      when is_binary(name) and is_binary(data) do
     encrypted_data =
       config.cipher.encrypt(
         config.key,
@@ -107,7 +110,7 @@ defmodule SecretVault do
   @spec resolve_path(Config.t(), name()) :: Path.t()
   def resolve_path(%Config{} = config, name) when is_binary(name) do
     file_name = "#{name}.vault_secret"
-    Path.join [resolve_path(config), file_name]
+    Path.join([resolve_path(config), file_name])
   end
 
   @doc """
@@ -115,7 +118,7 @@ defmodule SecretVault do
   """
   @spec resolve_path(Config.t()) :: Path.t()
   def resolve_path(%Config{priv_path: priv_path, env: env, prefix: prefix}) do
-    Path.join [priv_path, "secret_vault", env, prefix]
+    Path.join([priv_path, "secret_vault", env, prefix])
   end
 
   # Helpers
@@ -130,5 +133,4 @@ defmodule SecretVault do
       true -> {:error, :secret_not_found}
     end
   end
-
 end
