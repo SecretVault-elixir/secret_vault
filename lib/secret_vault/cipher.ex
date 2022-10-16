@@ -56,7 +56,7 @@ defmodule SecretVault.Cipher do
       iex> cipher = "MyNewCipher"
       ...> algorithm = "default"
       ...> ciphertext = "testtest"
-      ...> SecretVault.Cipher.pack(cipher, algorithm, [ciphertext])
+      ...> pack(cipher, algorithm, [ciphertext])
       "MyNewCipher;default;7465737474657374"
   """
   @spec pack(cipher, algorithm, [property]) :: binary
@@ -74,7 +74,7 @@ defmodule SecretVault.Cipher do
 
       iex> cipher = "MyNewCipher"
       iex> serialized = "MyNewCipher;default;7465737474657374"
-      iex> SecretVault.Cipher.unpack!(cipher, serialized)
+      iex> unpack!(cipher, serialized)
       ["default", "testtest"]
   """
   @spec unpack!(cipher, binary) :: [property]

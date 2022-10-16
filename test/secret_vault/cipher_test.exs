@@ -1,4 +1,4 @@
 defmodule SecretVault.CipherTest do
   use ExUnit.Case
-  doctest SecretVault.Cipher
+  doctest SecretVault.Cipher, import: true
 end
