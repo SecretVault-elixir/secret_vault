@@ -38,16 +38,6 @@ defmodule Mix.Tasks.Scr.Edit do
           "No configuration for prefix #{inspect(prefix)} found"
         )
 
-      {:error, :no_vaults_configured} ->
-        Mix.shell().error("No vaults configured for the app")
-
-      {:error, :no_prefix_provided_when_multiple_configured} ->
-        message =
-          "No prefix provided when multiple configured. " <>
-            "Use --prefix option to specify the prefix"
-
-        Mix.shell().error(message)
-
       {:error, {:non_zero_exit_code, code, message}} ->
         Mix.shell().error("Non zero exit code #{code}: #{message}")
 

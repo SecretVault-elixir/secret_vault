@@ -109,7 +109,7 @@ defmodule SecretVault do
   """
   @spec resolve_path(Config.t(), name()) :: Path.t()
   def resolve_path(%Config{} = config, name) when is_binary(name) do
-    file_name = "#{name}.vault_secret"
+    file_name = name <> unquote(extension)
     Path.join([resolve_path(config), file_name])
   end
 

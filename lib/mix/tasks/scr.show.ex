@@ -42,16 +42,6 @@ defmodule Mix.Tasks.Scr.Show do
       {:error, {:no_configuration_for_prefix, prefix}} ->
         Mix.shell().error("No configuration for prefix #{prefix} found")
 
-      {:error, :no_vaults_configured} ->
-        Mix.shell().error("No vaults configured for the app")
-
-      {:error, :no_prefix_provided_when_multiple_configured} ->
-        message =
-          "No prefix provided when multiple configured. " <>
-            "Use --prefix option to specify the prefix"
-
-        Mix.shell().error(message)
-
       {:error, :secret_not_found} ->
         message = "Secret #{name} not found in environment #{env}"
         Mix.shell().error(message)

@@ -9,9 +9,7 @@ defmodule SecretVaultTest do
     name = "secret_name_#{Enum.random(0..1000)}"
     data = "test data"
 
-    on_exit(fn ->
-      File.rm_rf!(SecretVault.resolve_path(config))
-    end)
+    on_exit(fn -> File.rm_rf!(SecretVault.resolve_path(config)) end)
 
     assert :ok = SecretVault.put(config, name, data)
 

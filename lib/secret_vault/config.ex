@@ -8,7 +8,7 @@ defmodule SecretVault.Config do
                 cipher: SecretVault.Cipher.ErlangCrypto,
                 cipher_opts: [],
                 priv_path: nil,
-                prefix: nil
+                prefix: "default"
               ]
 
   @typedoc """
@@ -101,7 +101,6 @@ defmodule SecretVault.Config do
             Keyword.get(opts, :key_derivation, SecretVault.KDFs.PBKDF2)
 
           key_derivation_opts = Keyword.get(opts, :key_derivation_opts, [])
-
           key_derivation.kdf(password, key_derivation_opts)
 
         true ->

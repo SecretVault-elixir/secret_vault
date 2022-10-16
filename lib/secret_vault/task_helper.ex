@@ -5,16 +5,16 @@ defmodule SecretVault.TaskHelper do
   alias SecretVault.Config
 
   @spec fetch_config(atom(), String.t(), Config.prefix()) ::
-          {:ok, Config.t()} | :error
+          {:ok, Config.t()}
+          | :error
+          | {:error, {:no_configuration_for_prefix, Config.prefix()}}
   def fetch_config(otp_app, env, nil), do: fetch_config(otp_app, env, "default")
 
   def fetch_config(otp_app, env, prefix) do
-    with {:ok, prefixes} <- Application.fetch_env(otp_app, :secret_vault) do
-      opts =
-        Enum.find_value(prefixes, fn {key, opts} ->
-          to_string(key) == prefix && opts
-        end)
-
+    with(
+      {:ok, prefixes} <- Application.fetch_env(otp_app, :secret_vault),
+      {:ok, opts} <- find_prefix(prefixes, prefix)
+    ) do
       priv_dir = File.cwd!()
 
       opts =
@@ -24,6 +24,16 @@ defmodule SecretVault.TaskHelper do
 
       config = Config.new(otp_app, opts)
       {:ok, %Config{config | env: env}}
+    end
+  end
+
+  defp find_prefix([], prefix),
+    do: {:error, {:no_configuration_for_prefix, prefix}}
+
+  defp find_prefix([{atom_prefix, opts} | rest], prefix) do
+    case to_string(atom_prefix) do
+      ^prefix -> {:ok, opts}
+      _ -> find_prefix(rest, prefix)
     end
   end
 
