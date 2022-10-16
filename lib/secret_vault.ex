@@ -88,14 +88,6 @@ defmodule SecretVault do
     end)
   end
 
-  @spec get(Config.t(), name(), default :: value()) :: value()
-  def get(%Config{} = config, name, default \\ "") do
-    case fetch(config, name) do
-      {:error, _} -> default
-      {:ok, data} -> data
-    end
-  end
-
   @doc """
   Remove secret `name` from the `environment`.
   """
