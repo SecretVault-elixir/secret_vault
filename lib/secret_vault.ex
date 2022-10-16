@@ -16,7 +16,9 @@ defmodule SecretVault do
   - `:unknown_prefix` means that directory with secrets is not present on disk
   - `:secret_not_found` means that secret file itself is not present
   """
-  @type reason :: :unknown_prefix | :secret_not_found
+  @type reason ::
+          {:unknown_prefix, Config.prefix(), env :: String.t()}
+          | {:secret_not_found, name :: String.t(), env :: String.t()}
 
   @typedoc """
   Name of a secret
@@ -60,7 +62,7 @@ defmodule SecretVault do
         {:ok, files}
 
       {:error, _} ->
-        {:error, :unknown_prefix}
+        {:error, {:unknown_prefix, config.prefix, config.env}}
     end
   end
 
@@ -128,7 +130,7 @@ defmodule SecretVault do
       iex> SecretVault.fetch(config, "db_password")
       {:ok, "super_secret_password"}
       iex> SecretVault.fetch(config, "non_present_password")
-      {:error, :secret_not_found}
+      {:error, {:secret_not_found, "non_present_password", "test"}}
   """
   @spec fetch(Config.t(), name) :: {:ok, value} | {:error, error}
         when error: reason | :invalid_encryption_key
@@ -196,7 +198,7 @@ defmodule SecretVault do
       iex> SecretVault.put(config, "db_password", "super_secret_password")
       iex> SecretVault.delete(config, "db_password")
       iex> SecretVault.fetch(config, "db_password")
-      {:error, :secret_not_found}
+      {:error, {:secret_not_found, "db_password", "test"}}
   """
   @spec delete(Config.t(), name()) :: :ok | {:error, reason()}
   def delete(%Config{} = config, name) when is_binary(name) do
@@ -246,9 +248,14 @@ defmodule SecretVault do
     file_path = resolve_secret_path(config, name)
 
     cond do
-      File.exists?(file_path) -> closure.(file_path)
-      not File.exists?(path) -> {:error, :unknown_prefix}
-      true -> {:error, :secret_not_found}
+      File.exists?(file_path) ->
+        closure.(file_path)
+
+      not File.exists?(path) ->
+        {:error, {:unknown_prefix, config.prefix, config.env}}
+
+      true ->
+        {:error, {:secret_not_found, name, config.env}}
     end
   end
 
