@@ -39,7 +39,6 @@ defmodule Mix.Tasks.Scr.Edit do
       Config.available_options()
       |> Enum.map(&{&1, CLI.find_option(rest, nil, "#{&1}")})
       |> Enum.reject(fn {_, value} -> is_nil(value) end)
-      |> Keyword.put_new(:priv_path, CLI.priv_path())
 
     with {:ok, config} <-
            Config.fetch_from_env(otp_app, environment, prefix, config_opts),

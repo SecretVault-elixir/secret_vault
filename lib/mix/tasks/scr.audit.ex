@@ -47,7 +47,6 @@ defmodule Mix.Tasks.Scr.Audit do
       Config.available_options()
       |> Enum.map(&{&1, CLI.find_option(args, nil, "#{&1}")})
       |> Enum.reject(fn {_, value} -> is_nil(value) end)
-      |> Keyword.put_new(:priv_path, CLI.priv_path())
 
     Enum.flat_map(envs, fn env ->
       # Mix.env(env)

@@ -3,37 +3,33 @@ defmodule SecretVault.ErrorFormatter do
   # Manages rendering errors in CLI
 
   @spec format(any()) :: String.t()
-  def format({:unknown_prefix, prefix, environment}) do
-    "Prefix #{inspect(prefix)} for environment #{inspect(environment)}" <>
-      " does not exist"
-  end
+  def format(message) do
+    case message do
+      {:unknown_prefix, prefix, environment} ->
+        "Prefix #{inspect(prefix)} for environment #{inspect(environment)}" <>
+          " does not exist"
 
-  def format({:secret_already_exists, name}) do
-    "Secret with name #{name} already exists"
-  end
+      {:secret_already_exists, name} ->
+        "Secret with name #{name} already exists"
 
-  def format({:secret_not_found, name, environment}) do
-    "Secret #{name} not found in environment #{inspect(environment)}"
-  end
+      {:secret_not_found, name, environment} ->
+        "Secret #{name} not found in environment #{inspect(environment)}"
 
-  def format({:no_configuration_for_prefix, prefix}) do
-    "No configuration for prefix #{inspect(prefix)} found"
-  end
+      {:no_configuration_for_prefix, prefix} ->
+        "No configuration for prefix #{inspect(prefix)} found"
 
-  def format({:no_configuration_for_app, otp_app}) do
-    "No configuration for otp_app #{otp_app} found"
-  end
+      {:no_configuration_for_app, otp_app} ->
+        "No configuration for otp_app #{otp_app} found"
 
-  def format({:non_zero_exit_code, code, message}) do
-    "Non zero exit code #{code}: #{message}"
-  end
+      {:non_zero_exit_code, code} ->
+        "Editor exited with code #{code}"
 
-  def format({:executable_not_found, editor}) do
-    "Editor not found: #{editor}"
-  end
+      {:executable_not_found, editor} ->
+        "Editor not found: #{editor}"
 
-  def format(:invalid_encryption_key) do
-    "Invalid key. It seems the secret was encrypted with " <>
-      "a different encryption key"
+      :invalid_encryption_key ->
+        "Invalid key. It seems the secret was encrypted with " <>
+          "a different encryption key"
+    end
   end
 end
