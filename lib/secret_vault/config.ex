@@ -21,7 +21,7 @@ defmodule SecretVault.Config do
   @type cipher :: module
 
   @typedoc """
-  Options for specified provider.
+  Options for specified cipher.
   """
   @type cipher_opts :: Keyword.t()
 

@@ -6,8 +6,8 @@ defmodule SecretVault.Cipher.Plaintext do
 
   > #### Warning {: .warning }
   >
-  > This cipher is insecure and supposed to be used only in testing
-  > or self encrypting filesystems.
+  > This cipher is insecure and it is supposed to be used only in testing
+  > or in self encrypting filesystems.
   """
 
   alias SecretVault.Cipher

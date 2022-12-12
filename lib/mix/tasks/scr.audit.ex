@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Scr.Audit do
   @moduledoc """
   Performs audit of passwords, detect duplicates and weak passwords.
-  Exits with 1 exit code if at least one check fails.
+  Exits with exit code `1` if at least one check fails.
 
   ## Check options
 

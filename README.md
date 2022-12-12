@@ -5,7 +5,7 @@ All-in-one solution for storing your Elixir application secrets inside the repos
 ## Features
 
 * **Standalone**. No dependencies on external binaries.
-* **Secure**. Uses `aes256gcm` cipher by default. Detects weak and similar passwords with `mix scr.audit` task.
+* **Secure**. Uses [aes256gcm](https://en.wikipedia.org/wiki/Galois/Counter_Mode) cipher by default. Detects weak and similar passwords with `mix scr.audit` task.
 * **Developer friendly**. You can use `mix scr.*` tasks to create or
   edit secrets in your favourit editor. Or you can use simple
   coreutils like `mv`, `rm`, `cp`.
@@ -22,9 +22,7 @@ All-in-one solution for storing your Elixir application secrets inside the repos
 
 ## Usage
 
-Check out our [tutorials](https://github.com/spawnfest/secret_vault/blob/main/guides/tutorials/usage.md)
-for usage and extension APIs. And build the documenation with `mix docs` since the project has not been
-published as a package yet.
+Check out this 5 minutes [usage tutorial](usage.md) for basics and useful links.
 
 ## Installation
 
@@ -33,12 +31,12 @@ Just add it to the list of dependencies like
 ```elixir
 def deps do
   [
-    {:secret_vault, github: "spawnfest/secret_vault"}
+    {:secret_vault, "~> 1.0"}
   ]
 end
 ```
 
-## Development
+## Hacking
 
 If you want to contribute to the project or just want to test it
 localy (not as a dependency), you'll need to create `config/config.exs`

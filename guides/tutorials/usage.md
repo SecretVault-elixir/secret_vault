@@ -6,11 +6,11 @@ secrets in runtime.
 
 ### Install
 
-Just add it into your dependenciess like
+Just add it into your dependencies like
 ```elixir
 defp deps do
   [
-    {:secret_vault, github: "spawnfest/secret_vault"}
+    {:secret_vault, "~> 1.0"}
   ]
 end
 ```
@@ -25,10 +25,12 @@ import Config
 
 config :my_app, :secret_vault,
   default: [password: System.fetch_env!("SECRET_VAULT_PASSWORD")]
+
+# Here `default` is a name of a default prefix. Prefixes work like namespaces for secrets.
 ```
 
-Here `default` is a name of a default prefix. Prefixes work like
-namespaces for secrets. You can provide options other than
+
+You can provide options other than
 `password`. To see a full list of those check out the
 `SecretVault.Config.new/2` documentation.
 
@@ -118,11 +120,13 @@ If you want to have you options in application env you can specify
 this in `config.exs`
 
 ```elixir
+# in config/config.exs
 import Config
 
 config :my_app, :secret_vault,
   default: [password: System.fetch_env!("SECRET_VAULT_PASSWORD")]
 
+# in application.ex start function
 {:ok, config} = SecretVault.Config.fetch_from_current_env(:my_app)
 SecretVault.Storage.to_application_env(config)
 ```
