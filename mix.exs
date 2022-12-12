@@ -36,7 +36,7 @@ defmodule SecretVault.MixProject do
         "README.md",
         ".formatter.exs"
       ],
-      organization: "secret_vault",
+      # organization: "secret_vault",
       maintainers: [
         "hissssst",
         "yunmikun2"
