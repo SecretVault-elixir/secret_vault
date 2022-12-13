@@ -214,10 +214,11 @@ defmodule SecretVault.Config do
   end
 
   defp check_priv(%__MODULE__{priv_path: priv} = config) do
-    if priv =~ "/_build/" do
+    with {:ok, %File.Stat{links: links}} when links <= 2 <- File.stat(priv) do
       IO.warn """
-      It looks like `priv` directory is inside `_build`
-      Generally, you need to avoid this. Please,
+      It looks like `priv` directory is inside `_build`. and it is not linked to `priv` in root
+      of your project. If you have called this task while `_build` path is not present, it's okay.
+      Otherwise, you need to avoid this. Please,
 
       1. Remove `_build` directory
       2. Create `priv` in root of your project
