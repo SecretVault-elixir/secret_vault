@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Scr.Insert do
 
   ## Usage
 
-      mix scr.insert prod database_password "My Super Secret Password"
+      $ mix scr.insert prod database_password "My Super Secret Password"
 
   ## Config override
 

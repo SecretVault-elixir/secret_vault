@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Scr.Edit do
 
   ## Usage
 
-      mix scr.edit prod database_url
+      $ mix scr.edit prod database_url
 
   ## Config override
 

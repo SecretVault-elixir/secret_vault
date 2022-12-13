@@ -13,12 +13,12 @@ defmodule Mix.Tasks.Scr.Show do
 
   To show the secret use
 
-      mix scr.show prod database_url
+      $ mix scr.show prod database_url
 
   If you want to list all the available secrets for the environment,
   you can run
 
-      mix scr.show prod
+      $ mix scr.show prod
 
   ## Config override
 

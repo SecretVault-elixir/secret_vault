@@ -15,6 +15,10 @@ defp deps do
 end
 ```
 
+### Create priv dir
+
+Just create a `priv` directory in the root of your project
+
 ### Configure
 
 Configuration is straightforward. Minimal configuration would look

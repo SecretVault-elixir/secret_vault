@@ -3,6 +3,10 @@ defmodule Mix.Tasks.Scr.Audit do
   Performs audit of passwords, detect duplicates and weak passwords.
   Exits with exit code `1` if at least one check fails.
 
+  ## Usage
+
+      $ mix scr.audit
+
   ## Check options
 
   - `--no-similarity` - to disable password similarity check

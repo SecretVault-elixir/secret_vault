@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Scr.Create do
 
   ## Usage
 
-      mix scr.create prod database_url
+      $ mix scr.create prod database_url
 
   ## Config override
 
