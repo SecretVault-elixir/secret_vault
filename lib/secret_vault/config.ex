@@ -145,7 +145,15 @@ defmodule SecretVault.Config do
           | {:error, {:no_configuration_for_prefix, prefix}}
   def fetch_from_current_env(otp_app, prefix \\ "default", opts \\ [])
       when is_atom(otp_app) and is_binary(prefix) do
-    fetch_from_env(otp_app, unquote(env), prefix, opts)
+
+    env =
+      if Code.ensure_loaded?(Mix) && function_exported?(Mix, :env, 0) do
+        to_string(Mix.env())
+      else
+        unquote(env)
+      end
+
+    fetch_from_env(otp_app, env, prefix, opts)
   end
 
   @doc false
