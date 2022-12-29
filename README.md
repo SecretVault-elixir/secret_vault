@@ -22,7 +22,7 @@ All-in-one solution for storing your Elixir application secrets inside the repos
 
 ## Usage
 
-Check out this 5 minutes [usage tutorial](usage.md) for basics and useful links.
+Check out this 5 minutes [usage tutorial](guides/tutorials/usage.md) for basics and useful links.
 
 ## Installation
 
