@@ -226,6 +226,47 @@ defmodule SecretVault do
     end
   end
 
+
+  @doc """
+  Helper macro for getting secrets in `config/runtime.exs` file.
+
+  ## Example
+
+  ```
+  # in `config/runtime.exs`
+  import Config
+  import SecretVault, only: [runtime_secret!: 2]
+
+  config :my_app, MyApp.Repo,
+    password: runtime_secret(:my_app, "database_password")
+  ```
+
+  For a list of available options, see `t:SecretVault.Config.config_option/0`
+  """
+  defmacro runtime_secret!(app_name, name, opts \\ []) do
+    quote bind_quoted: [app_name: app_name, name: name, opts: opts] do
+      require alias! Config
+      {prefix, opts} = Keyword.pop(opts, :prefix, "default")
+      {:ok, conf} = SecretVault.Config.fetch_from_env(app_name, alias!(Config).config_env(), prefix, opts)
+
+      SecretVault.fetch!(conf, name)
+    end
+  end
+
+  @doc """
+  Like `SecretVault.runtime_secret!/3` but accepts default value when secret is not found
+  as the third parameter.
+  """
+  defmacro runtime_secret(app_name, name, default \\ nil, opts \\ []) do
+    quote bind_quoted: [app_name: app_name, name: name, default: default, opts: opts] do
+      require alias! Config
+      {prefix, opts} = Keyword.pop(opts, :prefix, "default")
+      {:ok, conf} = SecretVault.Config.fetch_from_env(app_name, alias!(Config).config_env(), prefix, opts)
+
+      SecretVault.get(conf, name, default)
+    end
+  end
+
   # Resolves a path to the `name` secret
   @doc false
   @spec resolve_secret_path(Config.t(), name()) :: Path.t()

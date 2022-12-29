@@ -157,11 +157,15 @@ defmodule SecretVault.Config do
   end
 
   @doc false
-  @spec fetch_from_env(atom, String.t(), prefix, [config_option]) ::
+  @spec fetch_from_env(atom, String.t() | atom(), prefix, [config_option]) ::
           {:ok, t}
           | {:error, {:no_configuration_for_app, otp_app :: module}}
           | {:error, {:no_configuration_for_prefix, prefix}}
   def fetch_from_env(otp_app, env, prefix, opts \\ [])
+  def fetch_from_env(otp_app, env, prefix, opts) when is_atom(env) do
+    fetch_from_env(otp_app, to_string(env), prefix, opts)
+  end
+  def fetch_from_env(otp_app, env, prefix, opts)
       when is_atom(otp_app) and is_binary(env) and is_binary(prefix) do
     with {:ok, prefixes} <- fetch_application_env(otp_app),
          {:ok, env_opts} <- find_prefix(prefixes, prefix) do
