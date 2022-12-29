@@ -1,7 +1,7 @@
 defmodule SecretVault.MixProject do
   use Mix.Project
 
-  @version "1.0.1"
+  @version "1.1.0"
   @source "https://github.com/SecretVault-elixir/secret_vault"
 
   def project do

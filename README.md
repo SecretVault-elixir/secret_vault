@@ -46,3 +46,9 @@ file with following content.
 config :secret_vault, :secret_vault,
   default: [password: "Some super secret"]
 ```
+
+---
+
+### Thanks
+
+@benonymus -- for battle testing the project and giving the idea for `runtime_secret` macro
