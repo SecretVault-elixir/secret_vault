@@ -238,7 +238,7 @@ defmodule SecretVault do
   import SecretVault, only: [runtime_secret!: 2]
 
   config :my_app, MyApp.Repo,
-    password: runtime_secret(:my_app, "database_password")
+    password: runtime_secret!(:my_app, "database_password")
   ```
 
   For a list of available options, see `t:SecretVault.Config.config_option/0`
