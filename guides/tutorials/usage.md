@@ -153,7 +153,7 @@ import Config
 import SecretVault, only: [runtime_secret!: 2]
 
 config :playground, MyApp.Repo,
-  password: runtime_secret(:playground, "database_password")
+  password: runtime_secret!(:playground, "database_password")
 ```
 
 ### Release
