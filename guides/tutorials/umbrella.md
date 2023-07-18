@@ -1,12 +1,29 @@
-# Usage tutorial
+# Umbrella tutorial
 
-This is a 5 minutes `SecretVault` tutorial that shows how to install
-and configure `SecretVault`, and then create, delete, edit, and access
-secrets in runtime.
+This is a 6 minutes `SecretVault` tutorial that shows how to install
+and configure `SecretVault` for umbrella applications.
+
+## Setup
+
+Create a separate dummy application in your apps directory like
+```sh
+$ cd apps
+$ mix new secret_store
+$ cd secret_store
+```
+
+Remove lib and test directories and chagne README.md to reflect that
+this application is used solely for secret management
+
+```sh
+$ rm -rf lib test
+$ mkdir priv
+$ echo "# SecretStore\n\nDummy storage for secrets" > README.md
+```
 
 ## Install
 
-Just add it into your dependencies like
+Just add it into your `SecretStore`'s dependencies like
 ```elixir
 defp deps do
   [
@@ -14,10 +31,6 @@ defp deps do
   ]
 end
 ```
-
-## Create priv dir
-
-Just create a `priv` directory in the root of your project
 
 ## Configure
 
@@ -27,7 +40,7 @@ like this:
 ```elixir
 import Config
 
-config :my_app, :secret_vault,
+config :secret_store, :secret_vault,
   default: [password: System.fetch_env!("SECRET_VAULT_PASSWORD")]
 
 # Here `default` is a name of a default prefix. Prefixes work like namespaces for secrets.
@@ -49,7 +62,7 @@ To create a secret during development, you can use one of many secret
 creating tasks available. But do not forget to provide the enviroment
 variable with the password which we specified above.
 
-For example,
+For example (inside `apps/secret_store`),
 
 ```sh
 $ export SECRET_VAULT_PASSWORD="password" # Don't forget to change the password value
@@ -127,7 +140,7 @@ this in `config.exs`
 # in config/config.exs
 import Config
 
-config :my_app, :secret_vault,
+config :secret_store, :secret_vault,
   default: [password: System.fetch_env!("SECRET_VAULT_PASSWORD")]
 
 # in application.ex start function
@@ -152,8 +165,8 @@ So, to configure secrets in runtime, you can write something like:
 import Config
 import SecretVault, only: [runtime_secret!: 2]
 
-config :playground, MyApp.Repo,
-  password: runtime_secret!(:playground, "database_password")
+config :secret_store, MyApp.Repo,
+  password: runtime_secret!(:secret_store, "database_password")
 ```
 
 ## Release
