@@ -145,7 +145,6 @@ defmodule SecretVault.Config do
           | {:error, {:no_configuration_for_prefix, prefix}}
   def fetch_from_current_env(otp_app, prefix \\ "default", opts \\ [])
       when is_atom(otp_app) and is_binary(prefix) do
-
     env =
       if Code.ensure_loaded?(Mix) && function_exported?(Mix, :env, 0) do
         to_string(Mix.env())
@@ -162,9 +161,11 @@ defmodule SecretVault.Config do
           | {:error, {:no_configuration_for_app, otp_app :: module}}
           | {:error, {:no_configuration_for_prefix, prefix}}
   def fetch_from_env(otp_app, env, prefix, opts \\ [])
+
   def fetch_from_env(otp_app, env, prefix, opts) when is_atom(env) do
     fetch_from_env(otp_app, to_string(env), prefix, opts)
   end
+
   def fetch_from_env(otp_app, env, prefix, opts)
       when is_atom(otp_app) and is_binary(env) and is_binary(prefix) do
     with {:ok, prefixes} <- fetch_application_env(otp_app),
@@ -227,14 +228,14 @@ defmodule SecretVault.Config do
 
   defp check_priv(%__MODULE__{priv_path: priv} = config) do
     with {:ok, %File.Stat{links: links}} when links <= 2 <- File.stat(priv) do
-      IO.warn """
+      IO.warn("""
       It looks like `priv` directory is inside `_build`. and it is not linked to `priv` in root
       of your project. If you have called this task while `_build` path is not present, it's okay.
       Otherwise, you need to avoid this. Please,
 
       1. Remove `_build` directory
       2. Create `priv` in root of your project
-      """
+      """)
     end
 
     config

@@ -52,7 +52,9 @@ defmodule SecretVault do
     case File.ls(resolve_environment_path(config)) do
       {:ok, files} ->
         files =
-          Enum.map(files, fn filename ->
+          files
+          |> Enum.reject(&String.starts_with?(&1, "."))
+          |> Enum.map(fn filename ->
             {name, unquote(extension)} =
               String.split_at(filename, -unquote(byte_size(extension)))
 
@@ -226,7 +228,6 @@ defmodule SecretVault do
     end
   end
 
-
   @doc """
   Helper macro for getting secrets in `config/runtime.exs` file.
 
@@ -245,9 +246,16 @@ defmodule SecretVault do
   """
   defmacro runtime_secret!(app_name, name, opts \\ []) do
     quote bind_quoted: [app_name: app_name, name: name, opts: opts] do
-      require alias! Config
+      require alias!(Config)
       {prefix, opts} = Keyword.pop(opts, :prefix, "default")
-      {:ok, conf} = SecretVault.Config.fetch_from_env(app_name, alias!(Config).config_env(), prefix, opts)
+
+      {:ok, conf} =
+        SecretVault.Config.fetch_from_env(
+          app_name,
+          alias!(Config).config_env(),
+          prefix,
+          opts
+        )
 
       SecretVault.fetch!(conf, name)
     end
@@ -258,10 +266,22 @@ defmodule SecretVault do
   as the third parameter.
   """
   defmacro runtime_secret(app_name, name, default \\ nil, opts \\ []) do
-    quote bind_quoted: [app_name: app_name, name: name, default: default, opts: opts] do
-      require alias! Config
+    quote bind_quoted: [
+            app_name: app_name,
+            name: name,
+            default: default,
+            opts: opts
+          ] do
+      require alias!(Config)
       {prefix, opts} = Keyword.pop(opts, :prefix, "default")
-      {:ok, conf} = SecretVault.Config.fetch_from_env(app_name, alias!(Config).config_env(), prefix, opts)
+
+      {:ok, conf} =
+        SecretVault.Config.fetch_from_env(
+          app_name,
+          alias!(Config).config_env(),
+          prefix,
+          opts
+        )
 
       SecretVault.get(conf, name, default)
     end
