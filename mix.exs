@@ -68,6 +68,9 @@ defmodule SecretVault.MixProject do
 
   defp deps do
     [
+      # Testing mix tasks
+      {:mix_tester, "~> 1.0", only: :test},
+
       # Type checking
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:gradient, github: "esl/gradient", only: :dev, runtime: false},
