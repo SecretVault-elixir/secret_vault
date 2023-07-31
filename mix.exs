@@ -28,7 +28,7 @@ defmodule SecretVault.MixProject do
   defp package do
     [
       description: description(),
-      licenses: ["BSD 2-Clause"],
+      licenses: [~S|BSD 2-Clause "Simplified" License|],
       files: [
         "lib",
         "mix.exs",
