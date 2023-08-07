@@ -3,6 +3,19 @@ defmodule SecretVault.Config do
   Configuration for a `SecretVault` vault. This configuration
   defines ciphers, their options, holds simmetric encryption key
   and path to the vault.
+
+  You can set configuration as plain values like
+  ```elixir
+  config :my_app, :secret_vault,
+    default: [password: "super secret password"]
+  ```
+
+  Or like
+  ```elixir
+  config :my_app, :secret_vault,
+    default: [password: {System, :get_env, "SUPER_SECRET_PASSWORD"}]
+  ```
+  To fetch password in runtime with specified module function arity
   """
 
   @struct_keys [:key, :env] ++
@@ -54,7 +67,7 @@ defmodule SecretVault.Config do
   @type key :: binary()
 
   @typedoc """
-  Plain string password
+  Plain string password.
   """
   @type password :: String.t()
 
@@ -174,6 +187,13 @@ defmodule SecretVault.Config do
         env_opts
         |> Keyword.merge(opts)
         |> Keyword.put(:prefix, prefix)
+        |> Enum.map(fn
+          {key, {module, function, args}} ->
+            {key, apply(module, function, args)}
+
+          kv ->
+            kv
+        end)
 
       config = new(otp_app, opts)
       {:ok, %__MODULE__{config | env: env}}
