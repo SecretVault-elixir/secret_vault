@@ -11,8 +11,8 @@ All-in-one solution for storing your Elixir application secrets inside the repos
   coreutils like `mv`, `rm`, `cp`.
 * **Easy to use**. Documatation is rich, errors are descriptive and
   tutorials take no more than 5 minutes to read.
-* **VCS friendly**. `SecretVault` stores secrets in separate files,
-  thus makes it easily to track in VCS.
+* **Git friendly**. `SecretVault` stores secrets in separate files,
+  thus it is really easy to track in Git or any other VCS.
 * **Mix friendly**. `SecretVault` enforces separation of secrets for
   different environments.
 * **Extensible**. You can connect your own ciphers, vaults or key
