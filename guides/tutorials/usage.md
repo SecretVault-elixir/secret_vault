@@ -120,7 +120,7 @@ This will create config from configuration of your application and put
 all decrypted passwords in the `persistent_term`. See
 `SecretVault.Config` and `SecretVault.Storage` for more options.
 
-If you want to have you options in application env you can specify
+If you want to have your options in application env you can specify
 this in `config.exs`
 
 ```elixir
