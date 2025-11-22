@@ -247,15 +247,18 @@ defmodule SecretVault.Config do
   end
 
   defp check_priv(%__MODULE__{priv_path: priv} = config) do
-    with {:ok, %File.Stat{type: type}} when type != :symlink <- File.lstat(priv) do
-      IO.warn("""
-      It looks like `priv` directory is inside `_build`. and it is not linked to `priv` in root
-      of your project. If you have called this task while `_build` path is not present, it's okay.
-      Otherwise, you need to avoid this. Please,
+    if Code.ensure_loaded?(Mix) do
+      with {:ok, %File.Stat{type: type}} when type != :symlink <-
+             File.lstat(priv) do
+        IO.warn("""
+        It looks like `priv` directory is inside `_build`. and it is not linked to `priv` in root
+        of your project. If you have called this task while `_build` path is not present, it's okay.
+        Otherwise, you need to avoid this. Please,
 
-      1. Remove `_build` directory
-      2. Create `priv` in root of your project
-      """)
+        1. Remove `_build` directory
+        2. Create `priv` in root of your project
+        """)
+      end
     end
 
     config
